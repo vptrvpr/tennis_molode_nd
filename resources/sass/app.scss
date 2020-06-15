@@ -1,0 +1,40 @@
+@import 'variables';
+@import '~bootstrap/scss/bootstrap';
+@import '~sweetalert2/src/sweetalert2';
+
+@import 'elements/card';
+@import 'elements/navbar';
+@import 'elements/buttons';
+@import 'elements/transitions';
+@import 'pages/reservation';
+@import '~vuetify/dist/vuetify.min.css';
+
+.v-application--wrap {
+  flex: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: block;
+  flex-direction: unset;
+  min-height: unset;
+  max-width: 100%;
+  position: relative;
+}
+
+button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.theme--light.v-btn {
+  color: white;
+}
+
+.v-date-picker-table {
+  .v-btn:not(.v-btn--active) {
+    color: rgba(0, 0, 0, .87) !important;
+  }
+}
+
+.box-shadow-none{
+  box-shadow: none !important;
+}
