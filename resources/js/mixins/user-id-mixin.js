@@ -5,7 +5,7 @@ const UserIdMixin = {
     }
   },
   mounted() {
-    this.userId = localStorage.user_id
+    this.userId = parseInt( localStorage.user_id )
   }
 }
 
