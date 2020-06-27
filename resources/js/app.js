@@ -5,8 +5,10 @@ import i18n from '~/plugins/i18n'
 import App from '~/components/App'
 import Vuetify from 'vuetify'
 import moment from 'moment'
+import VueTheMask from 'vue-the-mask'
 
 Vue.use( Vuetify )
+Vue.use( VueTheMask )
 
 Vue.prototype.$blue = '#2196F3';
 Vue.prototype.$green = '#CDDC39';
@@ -18,6 +20,17 @@ const vuetify = new Vuetify( {
     current: 'ru',
   },
 } );
+
+function randomInteger( min, max ) {
+  // получить случайное число от (min-0.5) до (max+0.5)
+  let rand = min - 0.5 + Math.random() * ( max - min + 1 );
+  return Math.round( rand );
+}
+
+
+if ( localStorage.user_id === undefined ) {
+  localStorage.user_id = randomInteger( 1, 1000000 )
+}
 
 import '~/plugins'
 import '~/components'

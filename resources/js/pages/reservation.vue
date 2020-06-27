@@ -32,7 +32,7 @@
           <v-alert v-if="reservationHours.length >= 2" type="warning">
             Нельзя забронировать больше 2-х часов в день!
           </v-alert>
-          <v-btn v-else @click="reservation"
+          <v-btn v-else @click="dialog= true"
                  :disabled="selectedHours.length === 0 ? true : false"
                  :color="$blue">
             Забронировать
@@ -58,8 +58,7 @@
                   <td>{{court.name}}</td>
                   <template v-for="(hour,hourKey) in court.hours">
                     <v-menu
-                      transition="slide-y-transition"
-                      nudge-bottom="40"
+                      nudge-bottom="30"
                       :content-class="!hour.is_reservation ? 'box-shadow-none' : ''"
                       open-on-hover
                       bottom
@@ -82,7 +81,8 @@
                       </template>
                       <v-list v-if="hour.is_reservation">
                         <div class="p-1">
-                          Имя: {{hour.user.name}}<br>
+                          Коммент: {{hour.comment}}<br>
+                          Моб. телефон: {{hour.phone_number}}<br>
                           Дата бронирования: {{ $moment(hour.created_at).format('D.MM.YYYY hh:mm:ss')}}
                         </div>
                       </v-list>
@@ -96,14 +96,35 @@
         </div>
       </div>
     </v-app>
+    <v-dialog v-model="dialog" persistent max-width="400">
+      <v-card>
+        <v-card-text>
+          <div class="row">
+            <div class="col-md-12">
+              <v-text-field label="Моб. телефон" v-mask="'+7 (###) ###-##-##'" :color="$blue"
+                            v-model="newReservation.phone_number"/>
+            </div>
+            <div class="col-md-12">
+              <v-text-field label="Комментарий" :color="$blue" v-model="newReservation.comment"
+                            placeholder="Необязательно"/>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn color="green darken-1" text @click="dialog = false">Отмена</v-btn>
+          <v-btn color="green darken-1" text @click="reservation()">Забронировать</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 
 </template>
 
 <script>
   import axios from 'axios'
-  import AuthMixin from "../mixins/auth-mixin";
   import moment from 'moment'
+  import UserIdMixin from "../mixins/user-id-mixin"
 
 
   function initialState() {
@@ -116,20 +137,58 @@
       menu: false,
       modal: false,
       menu2: false,
+      selectedHours: [],
+      reservationHours: [],
+      dialog: false,
+      newReservation: {
+        phone_number: '',
+        comment: '',
+      }
     }
   }
 
 
   export default {
     name: "reservation.vue",
-    mixins: [AuthMixin],
+    mixins: [UserIdMixin],
     data() {
       return initialState()
     },
     mounted() {
       this.getCourts()
     },
+    watch: {
+      courtsJSON() {
+        this.selectedHours = []
+        this.reservationHours = []
+
+        this.courts.map( ( court, courtKey ) => {
+          court.hours.map( ( hour, hourKey ) => {
+            if ( hour.user_id === this.userId && hour.is_select ) {
+              this.selectedHours.push( {
+                court_name: court.name,
+                hour: hour.hour,
+                court_key: courtKey,
+                hour_key: hourKey,
+              } );
+            }
+            if ( hour.user_id === this.userId && hour.is_reservation ) {
+              this.reservationHours.push( {
+                court_name: court.name,
+                hour: hour.hour,
+                court_key: courtKey,
+                hour_key: hourKey,
+              } );
+            }
+          } )
+        } )
+      }
+
+    },
     computed: {
+      courtsJSON() {
+        return JSON.stringify( this.courts )
+      },
       hoursForTable() {
         var hours = [];
 
@@ -139,42 +198,6 @@
 
         return hours
       },
-      selectedHours() {
-        var selectedHours = []
-
-        this.courts.map( ( court, courtKey ) => {
-          court.hours.map( ( hour, hourKey ) => {
-            if ( hour.user_id === this.authUser.id && hour.is_select ) {
-              selectedHours.push( {
-                court_name: court.name,
-                hour: hour.hour,
-                court_key: courtKey,
-                hour_key: hourKey,
-              } );
-            }
-          } )
-        } )
-
-        return selectedHours
-      },
-      reservationHours() {
-        var reservationHours = []
-
-        this.courts.map( ( court, courtKey ) => {
-          court.hours.map( ( hour, hourKey ) => {
-            if ( hour.user_id === this.authUser.id && hour.is_reservation ) {
-              reservationHours.push( {
-                court_name: court.name,
-                hour: hour.hour,
-                court_key: courtKey,
-                hour_key: hourKey,
-              } );
-            }
-          } )
-        } )
-
-        return reservationHours
-      }
     },
     methods: {
       getCourts() {
@@ -191,20 +214,30 @@
         axios( {
           url: '/api/court/reservation',
           method: 'POST',
-          data: { courts: this.courts, date: this.date }
+          data: {
+            courts: this.courts, date: this.date, user_id: this.userId,
+            phone_number: this.newReservation.phone_number,
+            comment: this.newReservation.comment
+          }
         } ).then( ( r ) => {
           this.getCourts()
+          this.dialog = false
+          this.newReservation = initialState().newReservation
         } )
       },
 
       selectHour( courtKey, hourKey ) {
-        if ( ( this.selectedHours.length === 2 ) || ( this.selectedHours.length === 1 && this.reservationHours.length === 1 ) ) {
-          var deleteHour = this.selectedHours[ this.selectedHours.length - 1 ]
-          this.courts[ deleteHour.court_key ].hours[ deleteHour.hour_key ].user_id = null
-          this.courts[ deleteHour.court_key ].hours[ deleteHour.hour_key ].is_select = false
+        if ( this.selectedHours.length >= 2 ) {
+          var deleteHour1 = this.selectedHours[ 0 ]
+          var deleteHour2 = this.selectedHours[ 1 ]
+          this.courts[ deleteHour1.court_key ].hours[ deleteHour1.hour_key ].user_id = null
+          this.courts[ deleteHour1.court_key ].hours[ deleteHour1.hour_key ].is_select = false
+          this.courts[ deleteHour2.court_key ].hours[ deleteHour2.hour_key ].user_id = null
+          this.courts[ deleteHour2.court_key ].hours[ deleteHour2.hour_key ].is_select = false
+        } else {
+          this.courts[ courtKey ].hours[ hourKey ].user_id = this.userId
+          this.courts[ courtKey ].hours[ hourKey ].is_select = !this.courts[ courtKey ].hours[ hourKey ].is_select
         }
-        this.courts[ courtKey ].hours[ hourKey ].user_id = this.authUser.id
-        this.courts[ courtKey ].hours[ hourKey ].is_select = !this.courts[ courtKey ].hours[ hourKey ].is_select
       }
     },
   }

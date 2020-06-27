@@ -27,9 +27,9 @@ class CourtController extends Controller
             for( $h = Hour::HOUR_RANGE[ 0 ]; $h < Hour::HOUR_RANGE[ 1 ]; $h++ ) {
                 if( !isset( $hours[ $h ] ) ) {
                     $newHours[ $h ] = [
-                        "user_id"        => NULL,
                         "court_id"       => $court[ 'id' ],
                         "is_reservation" => FALSE,
+                        "user_id"        => NULL,
                         "is_select"      => FALSE,
                         "show_details"   => FALSE,
                         "hour"           => $h,
@@ -51,14 +51,16 @@ class CourtController extends Controller
     {
         $courts = $request->get( 'courts' );
         $date   = $request->get( 'date' );
-        $userId = \Auth::user()->id;
+        $userId = $request->get( 'user_id' );
 
         foreach( $courts as $court ) {
             foreach( $court[ 'hours' ] as $hour ) {
                 if( $hour[ 'user_id' ] == $userId ) {
                     $newHour                 = new Hour();
-                    $newHour->user_id        = $userId;
                     $newHour->is_reservation = TRUE;
+                    $newHour->user_id        = $userId;
+                    $newHour->phone_number   = $request->get( 'phone_number' );
+                    $newHour->comment        = $request->get( 'comment' );
                     $newHour->date           = $date;
                     $newHour->court_id       = $court[ 'id' ];
                     $newHour->hour           = $hour[ 'hour' ];

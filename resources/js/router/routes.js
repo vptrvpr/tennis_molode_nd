@@ -3,7 +3,8 @@ function page( path ) {
 }
 
 export default [
-  { path: '/', name: 'welcome', component: page( 'welcome.vue' ) },
+  { path: '/', name: 'welcome', redirect: '/reservation' },
+  { path: '/reservation', name: 'reservation', component: page( 'reservation.vue' ) },
 
   { path: '/login', name: 'login', component: page( 'auth/login.vue' ) },
   { path: '/register', name: 'register', component: page( 'auth/register.vue' ) },
@@ -13,7 +14,6 @@ export default [
   { path: '/email/resend', name: 'verification.resend', component: page( 'auth/verification/resend.vue' ) },
 
   { path: '/home', name: 'home', component: page( 'home.vue' ) },
-  { path: '/reservation', name: 'reservation', component: page( 'reservation.vue' ) },
   {
     path: '/settings',
     component: page( 'settings/index.vue' ),

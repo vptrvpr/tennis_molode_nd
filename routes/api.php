@@ -20,13 +20,12 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
 
     Route::patch( 'settings/profile', 'Settings\ProfileController@update' );
     Route::patch( 'settings/password', 'Settings\PasswordController@update' );
-
-
-    Route::get( 'court/get', 'CourtController@get' );
-    Route::post( 'court/reservation', 'CourtController@reservation' );
 } );
 
 Route::group( [ 'middleware' => 'guest:api' ], function() {
+    Route::get( 'court/get', 'CourtController@get' );
+    Route::post( 'court/reservation', 'CourtController@reservation' );
+
     Route::post( 'login', 'Auth\LoginController@login' );
     Route::post( 'register', 'Auth\RegisterController@register' );
 
