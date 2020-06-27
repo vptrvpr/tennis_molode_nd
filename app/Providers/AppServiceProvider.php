@@ -15,10 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningUnitTests()) {
-            Schema::defaultStringLength(191);
-        }
+        Schema::defaultStringLength( 191 );
     }
+
 
     /**
      * Register any application services.
@@ -27,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->environment('local', 'testing') && class_exists(DuskServiceProvider::class)) {
-            $this->app->register(DuskServiceProvider::class);
+        if( $this->app->environment( 'local', 'testing' ) && class_exists( DuskServiceProvider::class ) ) {
+            $this->app->register( DuskServiceProvider::class );
         }
     }
 }
