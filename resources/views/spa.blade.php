@@ -16,7 +16,7 @@
 
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ mix('dist/css/app.css') }}">
+  <link rel="stylesheet" href="{{env('APP_URL')}}dist/css/app.css">
 </head>
 <body>
 <div id="app">
@@ -28,6 +28,6 @@
 </script>
 
 {{-- Load the application scripts --}}
-<script src="{{ mix('dist/js/app.js') }}"></script>
+<script src="{{env('APP_URL')}}dist/js/app.js"></script>
 </body>
 </html>
