@@ -2,6 +2,9 @@
   <v-card shaped class="d-inline-block mx-auto vue__page__reservation w-100 d-flex justify-content-center">
     <v-app>
       <div class="row">
+        <div class="col-md-12 text-center">
+          <h6>Запись на муниципальные теннисные корты</h6>
+        </div>
         <div class="col-md-4 pt-1 pb-0"></div>
         <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center date-picker-for-reservation">
           <v-dialog
@@ -19,7 +22,7 @@
                 v-on="on"
               />
             </template>
-            <v-date-picker v-model="date" scrollable>
+            <v-date-picker :first-day-of-week="1" v-model="date" scrollable>
               <v-spacer/>
               <v-btn text color="primary" @click="modal = false">Отмена</v-btn>
               <v-btn text color="primary" @click="$refs.dialog.save(date)">Ок</v-btn>
@@ -101,12 +104,12 @@
         <v-card-text>
           <div class="row">
             <div class="col-md-12">
-              <v-text-field label="Моб. телефон" v-mask="'+7 (###) ###-##-##'" :color="$blue"
-                            v-model="newReservation.phone_number"/>
+              <v-text-field label="Имя и фамилия" :color="$blue" v-model="newReservation.fio"
+                            placeholder="Обязательно"/>
             </div>
             <div class="col-md-12">
-              <v-text-field label="Комментарий" :color="$blue" v-model="newReservation.comment"
-                            placeholder="Необязательно"/>
+              <v-text-field label="Код" :color="$blue" v-model="newReservation.code"
+                            placeholder="Обязательно"/>
             </div>
           </div>
         </v-card-text>
@@ -141,9 +144,10 @@
       reservationHours: [],
       dialog: false,
       newReservation: {
-        phone_number: '',
-        comment: '',
-      }
+        fio: '',
+        code: '',
+      },
+      hoursForTable: []
     }
   }
 
@@ -182,21 +186,14 @@
             }
           } )
         } )
+      },
+      date() {
+        this.getCourts()
       }
-
     },
     computed: {
       courtsJSON() {
         return JSON.stringify( this.courts )
-      },
-      hoursForTable() {
-        var hours = [];
-
-        for ( var i = 9; i < 22; i++ ) {
-          hours.push( `${i < 10 ? `0${i}-${i + 1}` : `${i}-${i + 1}`}` )
-        }
-
-        return hours
       },
     },
     methods: {
@@ -206,7 +203,8 @@
           method: 'GET',
           params: { date: this.date }
         } ).then( ( r ) => {
-          this.courts = r.data
+          this.courts = r.data.courts
+          this.hoursForTable = r.data.headers
         } )
       },
 
@@ -216,8 +214,8 @@
           method: 'POST',
           data: {
             courts: this.courts, date: this.date, user_id: this.userId,
-            phone_number: this.newReservation.phone_number,
-            comment: this.newReservation.comment
+            fio: this.newReservation.fio,
+            code: this.newReservation.code
           }
         } ).then( ( r ) => {
           this.getCourts()

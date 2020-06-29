@@ -26,15 +26,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereUpdatedAt( $value )
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereUserId( $value )
  * @mixin \Eloquent
- * @property bool $is_select
- * @property string $date
- * @property-read \App\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereIsSelect($value)
+ * @property bool                            $is_select
+ * @property string                          $date
+ * @property-read \App\User                  $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereDate( $value )
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereIsSelect( $value )
  */
 class Hour extends Model
 {
-    const HOUR_RANGE = [ 9, 22 ];
+    const HOUR_RANGE = [
+        'weekday' => [ 9, 23 ],
+        'weekend' => [ 10, 22 ],
+    ];
 
 
     /**
