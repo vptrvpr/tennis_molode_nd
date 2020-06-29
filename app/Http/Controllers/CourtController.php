@@ -21,7 +21,7 @@ class CourtController extends Controller
             $query->where( 'date', $date )->with( 'user' );
         } ] )->get()->toArray();
         $dayNow  = Carbon::create($date)->dayOfWeek;
-        $hoursBy = $dayNow >= 5 ? 'weekend' : 'weekday';
+        $hoursBy = $dayNow >= 6 ? 'weekend' : 'weekday';
 
         foreach( $courts as $key => $court ) {
             $newHours = [];
