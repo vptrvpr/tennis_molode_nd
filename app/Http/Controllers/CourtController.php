@@ -20,8 +20,8 @@ class CourtController extends Controller
         $courts  = Court::with( [ 'hours' => function( $query ) use ( $date ) {
             $query->where( 'date', $date )->with( 'user' );
         } ] )->get()->toArray();
-        $dayNow  = Carbon::create($date)->dayOfWeek;
-        $hoursBy = $dayNow >= 6 ? 'weekend' : 'weekday';
+        $dayNow  = Carbon::create( $date )->dayOfWeek;
+        $hoursBy = $dayNow == 6 || $dayNow == 7 ? 'weekend' : 'weekday';
 
         foreach( $courts as $key => $court ) {
             $newHours = [];
