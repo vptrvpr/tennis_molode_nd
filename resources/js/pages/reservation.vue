@@ -5,94 +5,136 @@
         <div class="col-md-12 text-center">
           <h6>Запись на муниципальные теннисные корты</h6>
         </div>
-        <div class="col-md-4 pt-1 pb-0"></div>
+        <div class="col-md-12 d-flex justify-content-center">
+          <div class="d-flex">
+            <v-btn class="btn-reservation-info"
+                   elevation="0"
+                   :color="$red"
+                   tile x-small>
+              <i style="font-size: 20px;" class="fas fa-times"/>
+            </v-btn>
+            <h6 class="ml-1 mt-1">- Отменить</h6>
+          </div>
+          <div class="d-flex ml-2">
+            <v-btn class="btn-reservation-info"
+                   elevation="0"
+                   disabled
+                   :color="$red"
+                   tile x-small>
+            </v-btn>
+            <h6 class="ml-1 mt-1">- Занято</h6>
+          </div>
+          <div class="d-flex ml-2">
+            <v-btn class="btn-reservation-info"
+                   elevation="0"
+                   :color="$blue"
+                   tile x-small>
+            </v-btn>
+            <h6 class="ml-1 mt-1">- Свободно</h6>
+          </div>
+        </div>
+        <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center">
+        </div>
         <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center date-picker-for-reservation">
-          <v-dialog
-            ref="dialog"
-            v-model="modal"
-            :return-value.sync="date"
-            persistent
-            width="290px"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="date"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              />
-            </template>
-            <v-date-picker :first-day-of-week="1" v-model="date" scrollable>
-              <v-spacer/>
-              <v-btn text color="primary" @click="modal = false">Отмена</v-btn>
-              <v-btn text color="primary" @click="$refs.dialog.save(date)">Ок</v-btn>
-            </v-date-picker>
-          </v-dialog>
+          <v-btn @click="changeWeek('sub')" class="mt-4" fab text :color="$blue" x-small><i style="font-size: 19px"
+                                                                                            class="fas fa-chevron-left"/>
+          </v-btn>
+          <v-text-field hide-details class="input-week-picker" v-model="weekForInput"
+                        disabled :color="$blue"/>
+          <v-btn @click="changeWeek('add')" class="mt-4" fab text :color="$blue" x-small><i style="font-size: 19px"
+                                                                                            class="fas fa-chevron-right"/>
+          </v-btn>
         </div>
         <div class="col-md-4 pt-1 pb-0"></div>
-        <div class="col-md-4 pt-1 pb-0"></div>
-        <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center">
-          <v-alert v-if="reservationHours.length >= 2" type="warning">
-            Нельзя забронировать больше 2-х часов в день!
-          </v-alert>
-          <v-btn v-else @click="dialog= true"
+        <div class="col-md-3 pt-1 pb-0"></div>
+        <div class="col-md-6 pt-1 pb-0 d-flex justify-content-center">
+          <v-btn @click="dialog= true"
                  :disabled="selectedHours.length === 0 ? true : false"
                  :color="$blue">
             Забронировать
           </v-btn>
         </div>
 
-        <div class="col-md-4 pt-1 pb-0"></div>
+        <div class="col-md-3 pt-1 pb-0"></div>
         <div class="col-md-2"></div>
         <div class="col-md-8 pt-1 pb-2">
-          <v-simple-table>
+          <v-simple-table fixed-header>
             <template v-slot:default>
               <thead>
               <tr>
-                <th class="text-center"/>
-                <th class="text-center" v-for="hours in hoursForTable">
-                  {{hours}}
+                <th colspan="1" class="text-center"/>
+                <th colspan="2" class="text-center" v-for="header in headersTable">
+                  {{header.name}}
                 </th>
+              </tr>
+              <tr>
+                <th colspan="1" class="text-center"/>
+                <template v-for="header in headersTable">
+                  <th class="pl-1 pr-1 text-center" v-for="court in header.courts">{{court.name}}</th>
+                </template>
               </tr>
               </thead>
               <tbody>
-              <template v-for="(court,courtKey)  in courts">
-                <tr>
-                  <td>{{court.name}}</td>
-                  <template v-for="(hour,hourKey) in court.hours">
+              <tr v-for="(hoursBy,key) in hours">
+                <td style="width: 36px;">{{getHours(key)}}</td>
+                <template v-for="(hour,hourKey) in hoursBy">
+                  <template v-if="hour.is_reservation !== undefined">
                     <v-menu
-                      nudge-bottom="30"
+                      nudge-left="40"
                       :content-class="!hour.is_reservation ? 'box-shadow-none' : ''"
                       open-on-hover
-                      bottom
-                      :attach="`#tdWithHour${court.id}${hour.hour}`"
+                      left
+                      :attach="`#tdWithHour${key}${hour.hour}`"
                     >
                       <template v-slot:activator="{ on, attrs }">
-                        <td v-bind="attrs"
-                            v-on="on"
-                            class="1"
-                            :id="`tdWithHour${court.id}${hour.hour}`"
+                        <td
+                          v-bind="attrs"
+                          v-on="on"
+                          :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
+                          :id="`tdWithHour${key}${hour.hour}`"
+                          v-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)">
+                          <v-btn class="button-for-reservation"
+                                 elevation="0"
+                                 @click="openDialogCancelReservation(hour.id)"
+                                 :color="$red"
+                                 tile x-small>
+                            <i style="font-size: 20px;" class="fas fa-times"/>
+                          </v-btn>
+                        </td>
+                        <td
+                          v-bind="attrs"
+                          v-on="on"
+                          v-else
+                          :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
+                          :id="`tdWithHour${key}${hour.hour}`"
                         >
                           <v-btn class="button-for-reservation"
-                                 @mousedown="selectHour(courtKey,hourKey)"
                                  :disabled="hour.is_reservation"
+                                 @click="selectHour(key,hourKey)"
+                                 :style="{opacity: hour.is_reservation && !hour.user_id ? 0.5 : 1}"
                                  elevation="0"
                                  :color="hour.is_select ? $green : $blue"
                                  tile x-small>
                           </v-btn>
                         </td>
+
                       </template>
-                      <v-list v-if="hour.is_reservation">
+                      <v-list v-if="hour.is_reservation && hour.user_id">
                         <div class="p-1">
-                          Коммент: {{hour.comment}}<br>
-                          Моб. телефон: {{hour.phone_number}}<br>
-                          Дата бронирования: {{ $moment(hour.created_at).format('D.MM.YYYY hh:mm:ss')}}
+                          Имя и фамилия: {{hour.user.name}}<br>
+                          <template v-if="authUser.checkRole(1)">
+                            Дата бронирования: {{ $moment(hour.created_at).format('DD.MM.YYYY hh:mm:ss')}}
+                          </template>
                         </div>
                       </v-list>
                     </v-menu>
                   </template>
-                </tr>
-              </template>
+                  <template v-else>
+                    <td/>
+                  </template>
+
+                </template>
+              </tr>
               </tbody>
             </template>
           </v-simple-table>
@@ -101,22 +143,23 @@
     </v-app>
     <v-dialog v-model="dialog" persistent max-width="400">
       <v-card>
-        <v-card-text>
-          <div class="row">
-            <div class="col-md-12">
-              <v-text-field label="Имя и фамилия" :color="$blue" v-model="newReservation.fio"
-                            placeholder="Обязательно"/>
-            </div>
-            <div class="col-md-12">
-              <v-text-field label="Код" :color="$blue" v-model="newReservation.code"
-                            placeholder="Обязательно"/>
-            </div>
-          </div>
-        </v-card-text>
+        <v-card-title class="text-center">Вы уверены ,что хотите<br> забронировать?</v-card-title>
         <v-card-actions>
           <v-spacer/>
-          <v-btn color="green darken-1" text @click="dialog = false">Отмена</v-btn>
-          <v-btn color="green darken-1" text @click="reservation()">Забронировать</v-btn>
+          <v-btn color="green darken-1" text @click="dialog = false">Нет</v-btn>
+          <v-btn color="green darken-1" text @click="reservation()">Да</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogCancelReservation" persistent max-width="400">
+      <v-card>
+        <v-card-title class="text-center">
+          Вы уверены ,что хотите<br> отменить бронь?
+        </v-card-title>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn color="green darken-1" text @click="dialogCancelReservation = false">Нет</v-btn>
+          <v-btn color="green darken-1" text @click="cancelReservation()">Да</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -127,84 +170,86 @@
 <script>
   import axios from 'axios'
   import moment from 'moment'
-  import UserIdMixin from "../mixins/user-id-mixin"
+  import AuthMixin from "../mixins/auth-mixin";
 
 
   function initialState() {
     return {
-      courts: [
-        { name: 'Корт №1', hours: [] },
-        { name: 'Корт №2', hours: [] },
-      ],
+      weeks: [],
       date: moment().format( 'YYYY-MM-D' ),
+      weeksPicker: {
+        1: moment().startOf( 'week' ),
+        2: moment().endOf( 'week' ),
+      },
       menu: false,
       modal: false,
       menu2: false,
       selectedHours: [],
       reservationHours: [],
+      dialogCancelReservation: false,
+      cancelReservationId: null,
       dialog: false,
       newReservation: {
         fio: '',
         code: '',
       },
-      hoursForTable: []
+      headersTable: [],
+      hours: []
     }
   }
 
 
   export default {
     name: "reservation.vue",
-    mixins: [UserIdMixin],
+    mixins: [AuthMixin],
+    middleware: ['auth', 'is-active'],
     data() {
       return initialState()
     },
     mounted() {
       this.getCourts()
     },
-    watch: {
-      courtsJSON() {
-        this.selectedHours = []
-        this.reservationHours = []
+    methods: {
+      openDialogCancelReservation( id ) {
+        this.dialogCancelReservation = true
+        this.cancelReservationId = id
+      },
 
-        this.courts.map( ( court, courtKey ) => {
-          court.hours.map( ( hour, hourKey ) => {
-            if ( hour.user_id === this.userId && hour.is_select ) {
-              this.selectedHours.push( {
-                court_name: court.name,
-                hour: hour.hour,
-                court_key: courtKey,
-                hour_key: hourKey,
-              } );
-            }
-            if ( hour.user_id === this.userId && hour.is_reservation ) {
-              this.reservationHours.push( {
-                court_name: court.name,
-                hour: hour.hour,
-                court_key: courtKey,
-                hour_key: hourKey,
-              } );
-            }
-          } )
+
+      cancelReservation() {
+        axios( {
+          method: 'DELETE',
+          url: '/api/court/reservation/' + this.cancelReservationId
+        } ).then( r => {
+          this.$notif( r.data )
+          this.getCourts()
+          this.dialogCancelReservation = false
         } )
       },
-      date() {
-        this.getCourts()
-      }
-    },
-    computed: {
-      courtsJSON() {
-        return JSON.stringify( this.courts )
+
+      changeWeek( type ) {
+        if ( type === 'sub' ) {
+          this.weeksPicker = {
+            1: this.weeksPicker[ 1 ].subtract( 7, 'days' ),
+            2: this.weeksPicker[ 2 ].subtract( 7, 'days' ),
+          }
+        } else if ( type === 'add' ) {
+          this.weeksPicker = {
+            1: this.weeksPicker[ 1 ].add( 7, 'days' ),
+            2: this.weeksPicker[ 2 ].add( 7, 'days' ),
+          }
+        }
       },
-    },
-    methods: {
+
       getCourts() {
         axios( {
           url: '/api/court/get',
           method: 'GET',
-          params: { date: this.date }
+          params: { date: [this.weeksPicker[ 1 ].format( 'YYYY-MM-DD' ), this.weeksPicker[ 2 ].format( 'YYYY-MM-DD' )] }
         } ).then( ( r ) => {
-          this.courts = r.data.courts
-          this.hoursForTable = r.data.headers
+          this.weeks = r.data.weeks
+          this.headersTable = r.data.headers
+          this.hours = r.data.hours
         } )
       },
 
@@ -213,29 +258,73 @@
           url: '/api/court/reservation',
           method: 'POST',
           data: {
-            courts: this.courts, date: this.date, user_id: this.userId,
-            fio: this.newReservation.fio,
-            code: this.newReservation.code
+            hours: this.hours,
           }
-        } ).then( ( r ) => {
+        } ).then( ( response ) => {
+          this.$notif( response.data )
           this.getCourts()
           this.dialog = false
-          this.newReservation = initialState().newReservation
+        } ).catch( ( error ) => {
+          this.dialog = false
+          this.$notif( error.response.data, true )
         } )
       },
 
-      selectHour( courtKey, hourKey ) {
+      selectHour( hourKey, key ) {
         if ( this.selectedHours.length >= 2 ) {
           var deleteHour1 = this.selectedHours[ 0 ]
           var deleteHour2 = this.selectedHours[ 1 ]
-          this.courts[ deleteHour1.court_key ].hours[ deleteHour1.hour_key ].user_id = null
-          this.courts[ deleteHour1.court_key ].hours[ deleteHour1.hour_key ].is_select = false
-          this.courts[ deleteHour2.court_key ].hours[ deleteHour2.hour_key ].user_id = null
-          this.courts[ deleteHour2.court_key ].hours[ deleteHour2.hour_key ].is_select = false
+          this.hours[ deleteHour1.hour_key ][ deleteHour1.key ].user_id = null
+          this.hours[ deleteHour1.hour_key ][ deleteHour1.key ].is_select = false
+          this.hours[ deleteHour2.hour_key ][ deleteHour2.key ].user_id = null
+          this.hours[ deleteHour2.hour_key ][ deleteHour2.key ].is_select = false
         } else {
-          this.courts[ courtKey ].hours[ hourKey ].user_id = this.userId
-          this.courts[ courtKey ].hours[ hourKey ].is_select = !this.courts[ courtKey ].hours[ hourKey ].is_select
+          this.hours[ hourKey ][ key ].user_id = this.authUser.id
+          this.hours[ hourKey ][ key ].is_select = !this.hours[ hourKey ][ key ].is_select
         }
+      },
+
+
+      getHours( hour ) {
+        return `${hour < 10 ? 0 + hour : hour}-${parseInt( hour ) + 1}`
+      }
+    },
+    watch: {
+      hoursJSON() {
+        this.selectedHours = []
+        this.reservationHours = []
+
+
+        for ( const [hourKey, hours] of Object.entries( this.hours ) ) {
+          hours.map( ( item, key ) => {
+            if ( item.user_id === this.authUser.id && item.is_select ) {
+              this.selectedHours.push( {
+                hour_key: hourKey,
+                hour: item.hour,
+                key: key,
+              } );
+            }
+
+            if ( item.user_id === this.authUser.id && item.is_reservation ) {
+              this.reservationHours.push( {
+                hour_key: hourKey,
+                hour: item.hour,
+                key: key,
+              } );
+            }
+          } )
+        }
+      },
+      weekForInput() {
+        this.getCourts()
+      }
+    },
+    computed: {
+      hoursJSON() {
+        return JSON.stringify( this.hours )
+      },
+      weekForInput() {
+        return `${this.weeksPicker[ 1 ].format( 'DD.MM.YYYY' )} - ${this.weeksPicker[ 2 ].format( 'DD.MM.YYYY' )}`;
       }
     },
   }

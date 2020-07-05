@@ -20,12 +20,19 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
 
     Route::patch( 'settings/profile', 'Settings\ProfileController@update' );
     Route::patch( 'settings/password', 'Settings\PasswordController@update' );
+
+
+    Route::group( [ 'middleware' => 'admin', 'namespace' => 'Admin', 'prefix' => 'admin' ], function() {
+        Route::get( '/user', 'UserController@get' );
+        Route::post( '/user/active/{userId}', 'UserController@active' );
+    } );
+
+    Route::get( 'court/get', 'CourtController@get' );
+    Route::post( 'court/reservation', 'CourtController@reservation' );
+    Route::delete( 'court/reservation/{id}', 'CourtController@cancelReservation' );
 } );
 
 Route::group( [ 'middleware' => 'guest:api' ], function() {
-    Route::get( 'court/get', 'CourtController@get' );
-    Route::post( 'court/reservation', 'CourtController@reservation' );
-
     Route::post( 'login', 'Auth\LoginController@login' );
     Route::post( 'register', 'Auth\RegisterController@register' );
 

@@ -10,11 +10,14 @@ class UserController extends Controller
     /**
      * Get authenticated user.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function current(Request $request)
+    public function current( Request $request )
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        $user->roles = $user->getRoles();
+        return response()->json( $request->user() );
     }
 }

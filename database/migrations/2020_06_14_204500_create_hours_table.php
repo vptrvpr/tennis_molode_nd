@@ -17,8 +17,8 @@ class CreateHoursTable extends Migration
             $table->id();
             $table->bigInteger( 'user_id' );
             $table->bigInteger( 'court_id' );
-            $table->string( 'fio' );
             $table->foreign( 'court_id' )->references( 'id' )->on( 'courts' )->onDelete( 'cascade' );
+            $table->foreign( 'user_id' )->references( 'id' )->on( 'users' )->onDelete( 'cascade' );
             $table->boolean( 'is_reservation' )->default( FALSE );
             $table->boolean( 'is_select' )->default( FALSE );
             $table->boolean( 'show_details' )->default( FALSE );

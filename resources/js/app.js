@@ -6,13 +6,38 @@ import App from '~/components/App'
 import Vuetify from 'vuetify'
 import moment from 'moment'
 import VueTheMask from 'vue-the-mask'
+import Notifications from 'vue-notification'
 
+
+Vue.use( Notifications )
 Vue.use( Vuetify )
 Vue.use( VueTheMask )
 
 Vue.prototype.$blue = '#2196F3';
+Vue.prototype.$red = '#F44336';
 Vue.prototype.$green = '#CDDC39';
 Vue.prototype.$moment = moment;
+
+
+Vue.prototype.$notif = function ( responseDate, error = false ) {
+  console.log(responseDate)
+  this.$notify( {
+    group: 'all',
+    title: error ? 'Ошибка' : 'Успешно',
+    text: responseDate.text,
+    type: error ? 'error' : 'success',
+    duration: 7500,
+  } );
+
+  return true;
+}
+
+
+moment.updateLocale( 'en', {
+  week: {
+    dow: 1,
+  },
+} )
 
 
 const vuetify = new Vuetify( {

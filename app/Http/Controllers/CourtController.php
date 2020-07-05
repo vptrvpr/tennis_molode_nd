@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Court;
 use App\Models\Hour;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 
 class CourtController extends Controller
@@ -16,45 +17,82 @@ class CourtController extends Controller
      */
     public function get( Request $request )
     {
-        $date    = $request->get( 'date' );
-        $courts  = Court::with( [ 'hours' => function( $query ) use ( $date ) {
-            $query->where( 'date', $date )->with( 'user' );
-        } ] )->get()->toArray();
-        $dayNow  = Carbon::create( $date )->dayOfWeek;
-        $hoursBy = $dayNow == 6 || $dayNow == 0 ? 'weekend' : 'weekday';
+        $date  = $request->get( 'date' );
+        $weeks = Court::WEEKS;
 
-        foreach( $courts as $key => $court ) {
-            $newHours = [];
-            $hours    = collect( $court[ 'hours' ] )->keyBy( 'hour' );
-            for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
-                if( !isset( $hours[ $h ] ) ) {
-                    $newHours[ $h ] = [
+        $allCourts = Court::all()->toArray();
+        $res       = [];
+
+        $courts = Court::with( [ 'hours' => function( $query ) use ( $date ) {
+            $query->whereBetween( 'date', $date )->with( 'user' );
+        } ] )->get()->keyBy( 'id' )->toArray();
+
+
+        $carbonPeriod = CarbonPeriod::create( $date[ 0 ], $date[ 1 ] )->toArray();
+        foreach( $weeks as $key => $week ) {
+            $headers[]                 = [
+                'name'   => $week[ 'name' ],
+                'courts' => $allCourts,
+            ];
+            $weeks[ $key ][ 'courts' ] = $allCourts;
+            $weeks[ $key ][ 'date' ]   = $carbonPeriod[ $key ];
+        }
+
+        foreach( $weeks as $key => $week ) {
+            foreach( $week[ 'courts' ] as $keyCourt => $court ) {
+                $weeks[ $key ][ 'courts' ][ $keyCourt ][ 'hours' ] = [];
+
+                $date      = $week[ 'date' ];
+                $dayOfWeek = $date->dayOfWeek;
+                $hoursBy   = $dayOfWeek == 6 || $dayOfWeek == 0 ? 'weekend' : 'weekday';
+                $hours     = collect( $courts[ $court[ 'id' ] ][ 'hours' ] )->keyBy( 'hour' );
+
+                for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
+                    $dateForCheck  = $date->hour( $h - 1 );
+                    $isReservation = Carbon::now()->gt( $dateForCheck );
+                    $hourEmpty     = [
                         "court_id"       => $court[ 'id' ],
-                        "is_reservation" => FALSE,
+                        "is_reservation" => $isReservation,
                         "user_id"        => NULL,
                         "is_select"      => FALSE,
                         "show_details"   => FALSE,
                         "hour"           => $h,
-                        "date"           => $date,
+                        "date"           => $date->format( 'Y-m-d' ),
                         "user"           => [],
                     ];
-                } else {
-                    $newHours[ $h ] = $hours[ $h ];
+
+
+                    if( !isset( $hours[ $h ] ) ) {
+                        $newHours[ $h ] = $hourEmpty;
+                    } else {
+
+                        if( $date->format( 'Y-m-d' ) == $hours[ $h ][ 'date' ] ) {
+                            $newHours[ $h ] = $hours[ $h ];
+                        } else {
+                            $newHours[ $h ] = $hourEmpty;
+                        }
+
+                    }
+                    if( Carbon::now()->gt( $dateForCheck ) ) {
+                        $newHours[ $h ][ 'user_id' ] = NULL;
+                    }
+                    $res[ $h ][] = $newHours[ $h ];
                 }
+
+                $weeks[ $key ][ 'courts' ][ $keyCourt ][ 'hours' ] = collect( $newHours )->values()->toArray();
             }
-            $courts[ $key ][ 'hours' ] = collect( $newHours )->values()->toArray();
         }
 
-        $headers = [];
-        for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
-            $hPlus1 = $h + 1;
-            array_push( $headers, $h < 10 ? "0$h-$hPlus1" : "$h-$hPlus1" );
+        foreach( $res as $key => $re ) {
+            if( count( $re ) != 14 ) {
+                $res[ $key ] = array_merge( $res[ $key ], [ [], [], [], [] ] );
+            }
         }
 
         return [
-            'courts'  => $courts,
+            'weeks'   => $weeks,
             'headers' => $headers,
-            'test'    => $dayNow,
+            'hours'   => $res,
         ];
     }
 
@@ -62,45 +100,64 @@ class CourtController extends Controller
     /**
      * @param Request $request
      *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Illuminate\Validation\ValidationException
      */
     public function reservation( Request $request )
     {
-        $code = 1515;
-
-
-        $courts = $request->get( 'courts' );
-        $date   = $request->get( 'date' );
-        $userId = $request->get( 'user_id' );
+        $hoursData = $request->get( 'hours' );
 
         $this->validate( $request, [
-            'courts'  => 'required',
-            'date'    => 'required',
-            'user_id' => 'required',
-            'fio'     => 'required',
-            'code'    => 'required',
+            'hours' => 'required',
         ] );
 
-        if( $code != $request->get( 'code' ) ) {
-            return response( 'Error code', 422 );
-        }
+        $byDate = [];
 
-        foreach( $courts as $court ) {
-            foreach( $court[ 'hours' ] as $hour ) {
-                if( $hour[ 'user_id' ] == $userId ) {
-                    $newHour                 = new Hour();
-                    $newHour->is_reservation = TRUE;
-                    $newHour->user_id        = $userId;
-                    $newHour->fio            = $request->get( 'fio' );
-                    $newHour->date           = $date;
-                    $newHour->court_id       = $court[ 'id' ];
-                    $newHour->hour           = $hour[ 'hour' ];
-                    $newHour->save();
+        foreach( $hoursData as $hours ) {
+            foreach( $hours as $hour ) {
+                if( !empty( $hour ) ) {
+                    $byDate[ $hour[ 'date' ] ][] = $hour;
                 }
             }
         }
 
-        return response( 'Success', 200 );
+        foreach( $byDate as $hoursByDate ) {
+            $hoursByDate = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
+            if( $hoursByDate > 2 ) {
+                return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
+            }
+        }
+
+        dd( 1 );
+
+        foreach( $hoursData as $hours ) {
+            foreach( $hours as $hour ) {
+                if( !empty( $hour ) ) {
+                    if( $hour[ 'user_id' ] == \Auth::id() ) {
+                        $newHour                 = new Hour();
+                        $newHour->is_reservation = TRUE;
+                        $newHour->user_id        = \Auth::id();
+                        $newHour->date           = $hour[ 'date' ];
+                        $newHour->court_id       = $hour[ 'court_id' ];
+                        $newHour->hour           = $hour[ 'hour' ];
+                        $newHour->save();
+                    }
+                }
+            }
+        }
+
+        return response()->json( [ 'text' => 'Вы успешно забронировали корт. Хорошей игры!' ] );
+    }
+
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelReservation( $id )
+    {
+        Hour::where( 'id', $id )->delete();
+        return response()->json( [ 'text' => 'Бронь отменена' ] );
     }
 }

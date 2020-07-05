@@ -4,7 +4,14 @@ function page( path ) {
 
 export default [
   { path: '/', name: 'welcome', redirect: '/reservation' },
+
   { path: '/reservation', name: 'reservation', component: page( 'reservation.vue' ) },
+  { path: '/not-active', name: 'not-active', component: page( 'not-active.vue' ) },
+
+
+  //admin
+  { path: '/admin', name: 'admin', redirect: '/admin/users' },
+  { path: '/admin/users', name: 'admin.users', component: page( 'admin/users.vue' ) },
 
   { path: '/login', name: 'login', component: page( 'auth/login.vue' ) },
   { path: '/register', name: 'register', component: page( 'auth/register.vue' ) },

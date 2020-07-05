@@ -7,6 +7,7 @@ use App\Notifications\VerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use jeremykenedy\LaravelRoles\Traits\HasRoleAndPermission;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
@@ -37,10 +38,17 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property bool $is_active
+ * @property-read \Illuminate\Database\Eloquent\Collection|\jeremykenedy\LaravelRoles\Models\Role[] $roles
+ * @property-read int|null $roles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\jeremykenedy\LaravelRoles\Models\Permission[] $userPermissions
+ * @property-read int|null $user_permissions_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereIsActive($value)
  */
 class User extends Authenticatable implements JWTSubject //, MustVerifyEmail
 {
     use Notifiable;
+    use HasRoleAndPermission;
 
     /**
      * The attributes that are mass assignable.

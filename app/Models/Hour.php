@@ -31,6 +31,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\User                  $user
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereDate( $value )
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereIsSelect( $value )
+ * @property string $fio
+ * @property bool $show_details
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereFio($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Hour whereShowDetails($value)
  */
 class Hour extends Model
 {
