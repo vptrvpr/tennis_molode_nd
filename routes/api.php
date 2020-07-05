@@ -30,6 +30,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
     Route::get( 'court/get', 'CourtController@get' );
     Route::post( 'court/reservation', 'CourtController@reservation' );
     Route::delete( 'court/reservation/{id}', 'CourtController@cancelReservation' );
+    Route::get( 'set-active-user/{userId}', 'CourtController@setActiveUser' );
 } );
 
 Route::group( [ 'middleware' => 'guest:api' ], function() {

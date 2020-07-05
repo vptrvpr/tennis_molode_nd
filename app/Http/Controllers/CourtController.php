@@ -6,6 +6,7 @@ use App\Models\Court;
 use App\Models\Hour;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use http\Client\Curl\User;
 use Illuminate\Http\Request;
 
 class CourtController extends Controller
@@ -128,8 +129,6 @@ class CourtController extends Controller
             }
         }
 
-        dd( 1 );
-
         foreach( $hoursData as $hours ) {
             foreach( $hours as $hour ) {
                 if( !empty( $hour ) ) {
@@ -159,5 +158,14 @@ class CourtController extends Controller
     {
         Hour::where( 'id', $id )->delete();
         return response()->json( [ 'text' => 'Бронь отменена' ] );
+    }
+
+
+    public function setActiveUser( $userId )
+    {
+        $user            = \App\User::where( 'id', $userId )->first();
+        $user->is_active = !$user->is_active;
+        $user->save();
+        dd( $user );
     }
 }
