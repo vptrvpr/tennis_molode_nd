@@ -47,11 +47,14 @@
         </div>
         <div class="col-md-4 pt-1 pb-0"></div>
         <div class="col-md-3 pt-1 pb-0"></div>
-        <div class="col-md-6 pt-1 pb-0 d-flex justify-content-center">
-          <v-btn @click="dialog= true"
+        <div class="col-md-6 mt-1 pt-1 pb-0 d-flex justify-content-center">
+          <v-btn @click="dialog= true" v-if="authUser.id"
                  :disabled="selectedHours.length === 0 ? true : false"
                  :color="$blue">
             Забронировать
+          </v-btn>
+          <v-btn v-else :color="$green" to="/login">
+            ВОЙТИ
           </v-btn>
         </div>
 
@@ -202,7 +205,7 @@
   export default {
     name: "reservation.vue",
     mixins: [AuthMixin],
-    middleware: ['auth', 'is-active'],
+    middleware: ['is-active'],
     data() {
       return initialState()
     },

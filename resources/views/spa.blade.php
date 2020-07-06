@@ -10,7 +10,7 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,width=800">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,width=700">
 
   <title>{{ config('app.name') }}</title>
 

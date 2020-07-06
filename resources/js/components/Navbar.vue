@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px;">
     <div class="container">
-      <!--      <router-link :to="{ name: user ? 'home' : 'welcome' }" class="navbar-brand">-->
-      <!--        {{ appName }}-->
-      <!--      </router-link>-->
+      <a href="http://molodnd.ru/" class="navbar-brand">
+        <img src="/img/Bely_logo.png" height="90px">
+      </a>
 
       <!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"-->
       <!--              aria-controls="navbarToggler" aria-expanded="false">-->
@@ -20,13 +20,13 @@
       <!---->
       <ul class="navbar-nav ml-auto">
         <!--          Authenticated-->
-        <li v-if="user" class="nav-item dropdown">
+        <li v-if="user.id" class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-dark"
              href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
           >
             <i class="fas fa-user-shield"></i>
             <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
-            {{user.name }}
+            {{ user.name }}
           </a>
           <div class="dropdown-menu">
             <router-link :to="{ name: 'settings.profile' }" class="dropdown-item pl-3">

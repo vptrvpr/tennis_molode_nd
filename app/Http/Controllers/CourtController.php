@@ -46,7 +46,7 @@ class CourtController extends Controller
                 $date      = $week[ 'date' ];
                 $dayOfWeek = $date->dayOfWeek;
                 $hoursBy   = $dayOfWeek == 6 || $dayOfWeek == 0 ? 'weekend' : 'weekday';
-                $hours     = collect( $courts[ $court[ 'id' ] ][ 'hours' ] )->keyBy( 'hour' );
+                $hours     = collect( $courts[ $court[ 'id' ] ][ 'hours' ] )->groupBy( 'hour' );
 
                 for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
                     $dateForCheck  = $date->hour( $h - 1 );
@@ -66,17 +66,22 @@ class CourtController extends Controller
                     if( !isset( $hours[ $h ] ) ) {
                         $newHours[ $h ] = $hourEmpty;
                     } else {
-
-                        if( $date->format( 'Y-m-d' ) == $hours[ $h ][ 'date' ] ) {
-                            $newHours[ $h ] = $hours[ $h ];
-                        } else {
+                        $searched = FALSE;
+                        foreach( $hours[ $h ] as $hourBy ) {
+                            if( $date->format( 'Y-m-d' ) === $hourBy[ 'date' ] ) {
+                                $newHours[ $h ] = $hourBy;
+                                $searched       = TRUE;
+                            }
+                        }
+                        if( !$searched ) {
                             $newHours[ $h ] = $hourEmpty;
                         }
-
                     }
+
                     if( Carbon::now()->gt( $dateForCheck ) ) {
                         $newHours[ $h ][ 'user_id' ] = NULL;
                     }
+
                     $res[ $h ][] = $newHours[ $h ];
                 }
 
@@ -132,7 +137,7 @@ class CourtController extends Controller
         foreach( $hoursData as $hours ) {
             foreach( $hours as $hour ) {
                 if( !empty( $hour ) ) {
-                    if( $hour[ 'user_id' ] == \Auth::id() ) {
+                    if( $hour[ 'user_id' ] == \Auth::id() && $hour && $hour[ 'is_select' ] ) {
                         $newHour                 = new Hour();
                         $newHour->is_reservation = TRUE;
                         $newHour->user_id        = \Auth::id();
