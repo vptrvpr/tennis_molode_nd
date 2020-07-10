@@ -38,7 +38,7 @@ mix.then(() => {
   }
 })
 
-function publishAseets () {
+function publishAseets ()
   const publicDir = path.resolve(__dirname, './public')
 
   if (mix.inProduction()) {

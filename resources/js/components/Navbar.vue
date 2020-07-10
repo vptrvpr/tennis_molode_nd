@@ -4,7 +4,6 @@
       <a href="http://molodnd.ru/" class="navbar-brand">
         <img src="/img/Bely_logo.png" height="90px">
       </a>
-
       <!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"-->
       <!--              aria-controls="navbarToggler" aria-expanded="false">-->
       <!--        <span class="navbar-toggler-icon"/>-->
