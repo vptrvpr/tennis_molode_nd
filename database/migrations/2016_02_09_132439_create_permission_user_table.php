@@ -22,9 +22,7 @@ class CreatePermissionUserTable extends Migration
             Schema::connection($connection)->create($table, function (Blueprint $table) use ($permissionsTable) {
                 $table->increments('id')->unsigned();
                 $table->integer('permission_id')->unsigned()->index();
-                $table->foreign('permission_id')->references('id')->on($permissionsTable)->onDelete('cascade');
                 $table->unsignedBigInteger('user_id')->unsigned()->index();
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
                 $table->timestamps();
                 $table->softDeletes();
             });
