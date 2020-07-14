@@ -99,7 +99,7 @@
                           :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
                           :id="`tdWithHour${key}${hour.hour}`"
                           v-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)
-                          || hour.time_has_expired">
+                          && hour.time_has_expired">
                           <v-btn class="button-for-reservation"
                                  elevation="0"
                                  @click="openDialogCancelReservation(hour.id)"

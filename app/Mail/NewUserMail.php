@@ -36,9 +36,9 @@ class NewUserMail extends Mailable
     {
         return $this->view( 'emails.new-user' )
                     ->subject( 'Tennis MolodNd' )
-                    ->bcc( 'vptrv.pr@gmail.com' )
-                    ->from( ' tennisnd@yandex.ru', 'Новый пользователь Tennis MolodNd' )
+                    ->from( 'tennisnd@yandex.ru', 'Новый пользователь Tennis MolodNd' )
                     ->with( [ 'user' => $this->user ] )
-                    ->to( ' tennisnd@yandex.ru' );
+                    ->bcc( 'vptrv.pr@gmail.com' )
+                    ->to( 'tennisnd@yandex.ru' );
     }
 }
