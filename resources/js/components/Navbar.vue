@@ -19,26 +19,29 @@
       <!---->
       <ul class="navbar-nav ml-auto">
         <!--          Authenticated-->
-        <li v-if="user.id" class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-dark"
-             href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-          >
-            <i class="fas fa-user-shield"></i>
-            <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
-            {{ user.name }}
-          </a>
-          <div class="dropdown-menu">
-            <router-link :to="{ name: 'settings.profile' }" class="dropdown-item pl-3">
-              <fa icon="cog" fixed-width/>
-              Настройка
-            </router-link>
+        <li v-if="user.id" class="nav-item dropdown" id="btnDropDownLogout">
+          <v-menu bottom nudge-bottom="45" attach="#btnDropDownLogout">
+            <template v-slot:activator="{ on, attrs }">
+              <a class="nav-link dropdown-toggle text-dark"
+                 v-bind="attrs"
+                 v-on="on"
+                 href="#" role="button"
+              >
+                <i class="fas fa-user-shield"></i>
+                <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
+                {{ user.name }}
+              </a>
+            </template>
 
-            <div class="dropdown-divider"/>
-            <a href="#" class="dropdown-item pl-3" @click.prevent="logout">
-              <fa icon="sign-out-alt" fixed-width/>
-              Выйти
-            </a>
-          </div>
+            <v-list>
+              <v-list-item :to="{ name: 'settings.profile' }" >
+                <v-list-item-title>Настройка</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click.prevent="logout">
+                <v-list-item-title>Выйти</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </li>
         <!--          Guest-->
         <template v-else>

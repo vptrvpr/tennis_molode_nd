@@ -48,12 +48,15 @@
         <div class="col-md-4 pt-1 pb-0"></div>
         <div class="col-md-3 pt-1 pb-0"></div>
         <div class="col-md-6 mt-1 pt-1 pb-0 d-flex justify-content-center">
-          <v-btn @click="dialog= true" v-if="authUser.id"
+          <v-btn @click="dialog= true" v-if="authUser.id && authUser.is_active"
                  :disabled="selectedHours.length === 0 ? true : false"
                  :color="$blue">
             Забронировать
           </v-btn>
-          <v-btn v-else :color="$green" to="/login">
+          <v-alert type="warning" v-else-if="authUser.id && !authUser.is_active">
+            Обратитесь к <a href="https://vk.com/yakov_nk" target="_blank">администратору</a>, для получения полномочий
+          </v-alert>
+          <v-btn v-else :color="$green" href="/login">
             ВОЙТИ
           </v-btn>
         </div>
@@ -79,7 +82,7 @@
               </thead>
               <tbody>
               <tr v-for="(hoursBy,key) in hours">
-                <td style="width: 36px;">{{getHours(key)}}</td>
+                <td style="width: 36px;white-space: nowrap;">{{getHours(key)}}</td>
                 <template v-for="(hour,hourKey) in hoursBy">
                   <template v-if="hour.is_reservation !== undefined">
                     <v-menu
@@ -95,7 +98,8 @@
                           v-on="on"
                           :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
                           :id="`tdWithHour${key}${hour.hour}`"
-                          v-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)">
+                          v-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)
+                          || hour.time_has_expired">
                           <v-btn class="button-for-reservation"
                                  elevation="0"
                                  @click="openDialogCancelReservation(hour.id)"
@@ -124,9 +128,9 @@
                       </template>
                       <v-list v-if="hour.is_reservation && hour.user_id">
                         <div class="p-1">
-                          Имя и фамилия: {{hour.user.name}}<br>
+                          {{hour.user.name}}<br>
                           <template v-if="authUser.checkRole(1)">
-                            Дата бронирования: {{ $moment(hour.created_at).format('DD.MM.YYYY hh:mm:ss')}}
+                            {{ $moment(hour.created_at).format('DD.MM.YYYY hh:mm:ss')}}
                           </template>
                         </div>
                       </v-list>
@@ -144,25 +148,25 @@
         </div>
       </div>
     </v-app>
-    <v-dialog v-model="dialog" persistent max-width="400">
+    <v-dialog v-model="dialog" persistent max-width="300">
       <v-card>
-        <v-card-title class="text-center">Вы уверены ,что хотите<br> забронировать?</v-card-title>
+        <v-card-title class="text-center justify-content-center">Вы уверены ,что хотите<br> забронировать?</v-card-title>
         <v-card-actions>
+          <v-btn color="green darken-1" large text @click="dialog = false">Нет</v-btn>
           <v-spacer/>
-          <v-btn color="green darken-1" text @click="dialog = false">Нет</v-btn>
-          <v-btn color="green darken-1" text @click="reservation()">Да</v-btn>
+          <v-btn color="green darken-1" large text @click="reservation()">Да</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogCancelReservation" persistent max-width="400">
+    <v-dialog v-model="dialogCancelReservation" persistent max-width="300">
       <v-card>
-        <v-card-title class="text-center">
+        <v-card-title class="text-center justify-content-center">
           Вы уверены ,что хотите<br> отменить бронь?
         </v-card-title>
         <v-card-actions>
+          <v-btn color="green darken-1" large text @click="dialogCancelReservation = false">Нет</v-btn>
           <v-spacer/>
-          <v-btn color="green darken-1" text @click="dialogCancelReservation = false">Нет</v-btn>
-          <v-btn color="green darken-1" text @click="cancelReservation()">Да</v-btn>
+          <v-btn color="green darken-1" large text @click="cancelReservation()">Да</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

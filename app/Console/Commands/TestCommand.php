@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\NewUserMail;
 use App\Models\Court;
 use App\Models\Hour;
 use Carbon\Carbon;
@@ -44,7 +45,8 @@ class TestCommand extends Command
      */
     public function handle()
     {
-
+        $user = \App\User::first();
+        \Mail::queue( new NewUserMail( $user ) );
 //        $date  = [ '2020-06-29', '2020-07-05' ];
 //        $weeks = Court::WEEKS;
 //        $res   = [];

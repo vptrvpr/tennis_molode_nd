@@ -52,14 +52,15 @@ class CourtController extends Controller
                     $dateForCheck  = $date->hour( $h - 1 );
                     $isReservation = Carbon::now()->gt( $dateForCheck );
                     $hourEmpty     = [
-                        "court_id"       => $court[ 'id' ],
-                        "is_reservation" => $isReservation,
-                        "user_id"        => NULL,
-                        "is_select"      => FALSE,
-                        "show_details"   => FALSE,
-                        "hour"           => $h,
-                        "date"           => $date->format( 'Y-m-d' ),
-                        "user"           => [],
+                        "court_id"        => $court[ 'id' ],
+                        "is_reservation"  => $isReservation,
+                        "user_id"         => NULL,
+                        "time_has_passed" => FALSE,
+                        "is_select"       => FALSE,
+                        "show_details"    => FALSE,
+                        "hour"            => $h,
+                        "date"            => $date->format( 'Y-m-d' ),
+                        "user"            => [],
                     ];
 
 
@@ -79,7 +80,7 @@ class CourtController extends Controller
                     }
 
                     if( Carbon::now()->gt( $dateForCheck ) ) {
-                        $newHours[ $h ][ 'user_id' ] = NULL;
+                        $newHours[ $h ][ 'time_has_passed' ] = TRUE;
                     }
 
                     $res[ $h ][] = $newHours[ $h ];
@@ -171,6 +172,8 @@ class CourtController extends Controller
         $user            = \App\User::where( 'id', $userId )->first();
         $user->is_active = !$user->is_active;
         $user->save();
-        dd( $user );
+
+        $text = $user->is_active ? 'активный' : 'неактивный';
+        return response()->json( [ 'text' => "Пользователь изменен на {$text}" ] );
     }
 }

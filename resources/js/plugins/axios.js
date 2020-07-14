@@ -31,7 +31,7 @@ axios.interceptors.response.use( response => {
   }
   return response;
 }, error => {
-  const { status } = error.response
+  const { status, data } = error.response
   const { config } = error
 
   if ( config.is_background !== true ) {
@@ -40,6 +40,10 @@ axios.interceptors.response.use( response => {
 
   if ( status >= 500 ) {
     Vue.prototype.$notification( 'Упс, произошла ошибка. Попробуйте позже...', true )
+  }
+
+  if ( data.text !== undefined ) {
+    Vue.prototype.$notification( data.text )
   }
 
   // if ( status == 422 ) {

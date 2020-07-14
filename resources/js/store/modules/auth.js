@@ -5,9 +5,9 @@ import * as types from '../mutation-types'
 // state
 export const state = {
   user: {
-    id: null,
+    id: 0,
     checkRole: function ( role ) {
-      return false
+      return true
     },
   },
   token: Cookies.get( 'token' )
@@ -17,7 +17,7 @@ export const state = {
 export const getters = {
   user: state => state.user,
   token: state => state.token,
-  check: state => state.user.id !== null
+  check: state => state.user.id !== 0
 }
 
 // mutations
