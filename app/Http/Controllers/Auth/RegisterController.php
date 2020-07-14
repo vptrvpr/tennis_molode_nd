@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewUserMail;
 use App\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -79,6 +80,8 @@ class RegisterController extends Controller
 
         $role = config( 'roles.models.role' )::where( 'name', '=', 'User' )->first();  //choose the default role upon user creation.
         $user->attachRole( $role );
+
+        \Mail::queue( new NewUserMail( $user ) );
 
         return $user;
     }
