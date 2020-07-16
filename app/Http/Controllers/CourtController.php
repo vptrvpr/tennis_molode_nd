@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use http\Client\Curl\User;
 use Illuminate\Http\Request;
+use jeremykenedy\LaravelRoles\Models\Role;
 
 class CourtController extends Controller
 {
@@ -130,7 +131,7 @@ class CourtController extends Controller
 
         foreach( $byDate as $hoursByDate ) {
             $hoursByDate = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
-            if( $hoursByDate > 2 ) {
+            if( $hoursByDate > 2 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
             }
         }

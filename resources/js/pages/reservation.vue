@@ -150,7 +150,8 @@
     </v-app>
     <v-dialog v-model="dialog" persistent max-width="300">
       <v-card>
-        <v-card-title class="text-center justify-content-center">Вы уверены ,что хотите<br> забронировать?</v-card-title>
+        <v-card-title class="text-center justify-content-center">Вы уверены ,что хотите<br> забронировать?
+        </v-card-title>
         <v-card-actions>
           <v-btn color="green darken-1" large text @click="dialog = false">Нет</v-btn>
           <v-spacer/>
@@ -278,7 +279,8 @@
       },
 
       selectHour( hourKey, key ) {
-        if ( this.selectedHours.length >= 2 ) {
+        console.log( this.authUser.checkRole( 1 ) )
+        if ( this.selectedHours.length >= 2 && !this.authUser.checkRole( 1 ) ) {
           var deleteHour1 = this.selectedHours[ 0 ]
           var deleteHour2 = this.selectedHours[ 1 ]
           this.hours[ deleteHour1.hour_key ][ deleteHour1.key ].user_id = null
