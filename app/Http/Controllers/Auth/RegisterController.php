@@ -80,8 +80,9 @@ class RegisterController extends Controller
 
         $role = config( 'roles.models.role' )::where( 'name', '=', 'User' )->first();  //choose the default role upon user creation.
         $user->attachRole( $role );
+        $user->roles = $user->getRoles();
 
-        \Mail::queue( new NewUserMail( $user ) );
+//        \Mail::queue( new NewUserMail( $user ) );
 
         return $user;
     }

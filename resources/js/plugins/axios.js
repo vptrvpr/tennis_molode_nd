@@ -3,6 +3,7 @@ import store from '~/store'
 import router from '~/router'
 import Swal from 'sweetalert2'
 import i18n from '~/plugins/i18n'
+import Vue from 'vue'
 
 
 axios.interceptors.request.use( request => {

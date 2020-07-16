@@ -2,16 +2,22 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import * as types from '../mutation-types'
 
-// state
-export const state = {
-  user: {
-    id: 0,
-    checkRole: function ( role ) {
-      return true
+
+function initialState() {
+  return {
+    user: {
+      id: 0,
+      checkRole: function ( role ) {
+        return true
+      },
+      roles: []
     },
-  },
-  token: Cookies.get( 'token' )
+    token: Cookies.get( 'token' )
+  }
 }
+
+// state
+export const state = initialState()
 
 // getters
 export const getters = {
@@ -46,7 +52,7 @@ export const mutations = {
   },
 
   [ types.LOGOUT ]( state ) {
-    state.user = null
+    state.user = initialState().user
     state.token = null
 
     Cookies.remove( 'token' )

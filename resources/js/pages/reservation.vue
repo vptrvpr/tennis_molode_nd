@@ -279,7 +279,6 @@
       },
 
       selectHour( hourKey, key ) {
-        console.log( this.authUser.checkRole( 1 ) )
         if ( this.selectedHours.length >= 2 && !this.authUser.checkRole( 1 ) ) {
           var deleteHour1 = this.selectedHours[ 0 ]
           var deleteHour2 = this.selectedHours[ 1 ]

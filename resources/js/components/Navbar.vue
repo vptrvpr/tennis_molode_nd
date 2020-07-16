@@ -27,14 +27,14 @@
                  v-on="on"
                  href="#" role="button"
               >
-                <i class="fas fa-user-shield"></i>
+                <i v-if="user.checkRole(1)" class="fas fa-user-shield"></i>
                 <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
                 {{ user.name }}
               </a>
             </template>
 
             <v-list>
-              <v-list-item :to="{ name: 'settings.profile' }" >
+              <v-list-item :to="{ name: 'settings.profile' }">
                 <v-list-item-title>Настройка</v-list-item-title>
               </v-list-item>
               <v-list-item @click.prevent="logout">
