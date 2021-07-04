@@ -25,6 +25,8 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
     Route::group( [ 'middleware' => 'admin', 'namespace' => 'Admin', 'prefix' => 'admin' ], function() {
         Route::get( '/user', 'UserController@get' );
         Route::post( '/user/active/{userId}', 'UserController@active' );
+        Route::post( '/user/admin/{userId}', 'UserController@admin' );
+        Route::post( '/user/delete/{userId}', 'UserController@delete' );
     } );
 
     Route::post( 'court/reservation', 'CourtController@reservation' );

@@ -7,8 +7,10 @@ import Vuetify from 'vuetify'
 import moment from 'moment'
 import VueTheMask from 'vue-the-mask'
 import Notifications from 'vue-notification'
+import { WebRTC } from 'vue-webrtc'
 
 
+Vue.component( WebRTC.name, WebRTC )
 Vue.use( Notifications )
 Vue.use( Vuetify )
 Vue.use( VueTheMask )
@@ -20,41 +22,40 @@ Vue.prototype.$moment = moment;
 
 
 Vue.prototype.$notif = function ( responseDate, error = false ) {
-  console.log(responseDate)
-  this.$notify( {
-    group: 'all',
-    title: error ? 'Ошибка' : 'Успешно',
-    text: responseDate.text,
-    type: error ? 'error' : 'success',
-    duration: 7500,
-  } );
+    this.$notify( {
+        group: 'all',
+        title: error ? 'Ошибка' : 'Успешно',
+        text: responseDate.text,
+        type: error ? 'error' : 'success',
+        duration: 7500,
+    } );
 
-  return true;
+    return true;
 }
 
 
 moment.updateLocale( 'en', {
-  week: {
-    dow: 1,
-  },
+    week: {
+        dow: 1,
+    },
 } )
 
 
 const vuetify = new Vuetify( {
-  lang: {
-    current: 'ru',
-  },
+    lang: {
+        current: 'ru',
+    },
 } );
 
 function randomInteger( min, max ) {
-  // получить случайное число от (min-0.5) до (max+0.5)
-  let rand = min - 0.5 + Math.random() * ( max - min + 1 );
-  return Math.round( rand );
+    // получить случайное число от (min-0.5) до (max+0.5)
+    let rand = min - 0.5 + Math.random() * ( max - min + 1 );
+    return Math.round( rand );
 }
 
 
 if ( localStorage.user_id === undefined ) {
-  localStorage.user_id = randomInteger( 1, 1000000 )
+    localStorage.user_id = randomInteger( 1, 1000000 )
 }
 
 import '~/plugins'
@@ -64,9 +65,9 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue( {
-  i18n,
-  store,
-  router,
-  vuetify,
-  ...App
+    i18n,
+    store,
+    router,
+    vuetify,
+    ...App
 } )

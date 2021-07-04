@@ -14,7 +14,7 @@
 
   export default {
     layout: 'basic',
-    middleware: ['auth'],
+    middleware: 'is-active-page',
 
     metaInfo() {
       return { title: this.$t( 'home' ) }

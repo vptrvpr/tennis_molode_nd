@@ -12,7 +12,8 @@ function initialState() {
       },
       roles: []
     },
-    token: Cookies.get( 'token' )
+    token: Cookies.get( 'token' ),
+    role_ids: []
   }
 }
 
@@ -61,7 +62,7 @@ export const mutations = {
   [ types.UPDATE_USER ]( state, { user } ) {
     user.checkRole = function ( roleId ) {
       var checkResult = false
-      user.roles.map( item => {
+      user.roles.ma( item => {
         if ( item.id === roleId ) {
           checkResult = true
         }

@@ -7,66 +7,66 @@ import Vue from 'vue'
 
 
 axios.interceptors.request.use( request => {
-  const token = store.getters[ 'auth/token' ]
-  if ( token ) {
-    request.headers.common[ 'Authorization' ] = `Bearer ${token}`
-  }
+    const token = store.getters[ 'auth/token' ]
+    if ( token ) {
+        request.headers.common[ 'Authorization' ] = `Bearer ${token}`
+    }
 
-  if ( request.is_background !== true ) {
-    store.dispatch( 'preloader/addPreloader' )
-  }
+    if ( request.is_background !== true ) {
+        store.dispatch( 'preloader/addPreloader' )
+    }
 
-  const locale = store.getters[ 'lang/locale' ]
-  if ( locale ) {
-    request.headers.common[ 'Accept-Language' ] = locale
-  }
+    const locale = store.getters[ 'lang/locale' ]
+    if ( locale ) {
+        request.headers.common[ 'Accept-Language' ] = locale
+    }
 
-  return request
+    return request
 } )
 
 
 // Response interceptor
 axios.interceptors.response.use( response => {
-  if ( response.config.is_background !== true ) {
-    store.dispatch( 'preloader/deletePreloader' )
-  }
-  return response;
+    if ( response.config.is_background !== true ) {
+        store.dispatch( 'preloader/deletePreloader' )
+    }
+    return response;
 }, error => {
-  const { status, data } = error.response
-  const { config } = error
+    const { status, data } = error.response
+    const { config } = error
 
-  if ( config.is_background !== true ) {
-    store.dispatch( 'preloader/deletePreloader' )
-  }
+    if ( config.is_background !== true ) {
+        store.dispatch( 'preloader/deletePreloader' )
+    }
 
-  if ( status >= 500 ) {
-    Vue.prototype.$notification( 'Упс, произошла ошибка. Попробуйте позже...', true )
-  }
+    if ( status >= 500 ) {
+        Vue.prototype.$notification( 'Упс, произошла ошибка. Попробуйте позже...', true )
+    }
 
-  if ( data.text !== undefined ) {
-    Vue.prototype.$notification( data.text )
-  }
+    if ( data.text !== undefined ) {
+        Vue.prototype.$notif( data, true )
+    }
 
-  // if ( status == 422 ) {
-  //   Vue.prototype.$notification( 'Проверьте правильность ввода данных и повторите попытку', true )
-  // }
+    // if ( status == 422 ) {
+    //   Vue.prototype.$notification( 'Проверьте правильность ввода данных и повторите попытку', true )
+    // }
 
-  if ( status === 401 && store.getters[ 'auth/check' ] ) {
-    Swal.fire( {
-      type: 'warning',
-      title: i18n.t( 'token_expired_alert_title' ),
-      text: i18n.t( 'token_expired_alert_text' ),
-      reverseButtons: true,
-      confirmButtonText: i18n.t( 'ok' ),
-      cancelButtonText: i18n.t( 'cancel' )
-    } ).then( () => {
-      store.commit( 'auth/LOGOUT' )
+    if ( status === 401 && store.getters[ 'auth/check' ] ) {
+        Swal.fire( {
+            type: 'warning',
+            title: i18n.t( 'token_expired_alert_title' ),
+            text: i18n.t( 'token_expired_alert_text' ),
+            reverseButtons: true,
+            confirmButtonText: i18n.t( 'ok' ),
+            cancelButtonText: i18n.t( 'cancel' )
+        } ).then( () => {
+            store.commit( 'auth/LOGOUT' )
 
-      router.push( { name: 'login' } )
-    } )
-  }
+            router.push( { name: 'login' } )
+        } )
+    }
 
-  return Promise.reject( error )
+    return Promise.reject( error )
 } )
 
 

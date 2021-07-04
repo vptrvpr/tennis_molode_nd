@@ -130,9 +130,24 @@ class CourtController extends Controller
         }
 
         foreach( $byDate as $hoursByDate ) {
-            $hoursByDate = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
-            if( $hoursByDate > 2 && !\Auth::user()->checkRole( 1 ) ) {
+            $hoursByDateForCheck = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
+            if( $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
+            }
+
+            $hoursByCourts = collect( $hoursByDate )->groupBy( 'court_id' );
+
+            foreach( $hoursByCourts as $hoursByCourt ) {
+                $hoursByCourtSelect = $hoursByCourt->where( 'is_select', TRUE );
+
+                $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
+                    $carbonDate = Carbon::create($item['date']);
+                    return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
+                } );
+
+                if($hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 )){
+                    return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
+                }
             }
         }
 
