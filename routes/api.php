@@ -27,6 +27,13 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
         Route::post( '/user/active/{userId}', 'UserController@active' );
         Route::post( '/user/admin/{userId}', 'UserController@admin' );
         Route::post( '/user/delete/{userId}', 'UserController@delete' );
+
+
+        Route::post( '/file-links/store', 'FileLinkController@store' );
+        Route::get( '/file-links', 'FileLinkController@get' );
+        Route::post( '/file-links/delete/{id}', 'FileLinkController@delete' );
+
+
     } );
 
     Route::post( 'court/reservation', 'CourtController@reservation' );

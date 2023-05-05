@@ -129,9 +129,26 @@ class CourtController extends Controller
             }
         }
 
-        foreach( $byDate as $hoursByDate ) {
+        foreach( $byDate as $date => $hoursByDate ) {
             $hoursByDateForCheck = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
-            if( $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
+
+            if( $date != '2023-05-05' ) {
+                continue;
+            }
+
+
+            $isSelectHours = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
+
+            if( $isSelectHours ) {
+                $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] - 1 ) . ':00:00';
+                $carbonHowMuchMinutes  = Carbon::now()->diffInMinutes( $carbonDateCourtString );
+            } else {
+                $carbonHowMuchMinutes = 20;
+            }
+
+
+
+            if( !( $carbonHowMuchMinutes < 15 ) && $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
             }
 
@@ -141,11 +158,11 @@ class CourtController extends Controller
                 $hoursByCourtSelect = $hoursByCourt->where( 'is_select', TRUE );
 
                 $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
-                    $carbonDate = Carbon::create($item['date']);
+                    $carbonDate = Carbon::create( $item[ 'date' ] );
                     return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
                 } );
 
-                if($hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 )){
+                if( $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
                     return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
                 }
             }
