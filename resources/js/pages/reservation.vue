@@ -7,7 +7,7 @@
             <h6>Запись на муниципальные теннисные корты</h6>
           </div>
           <div style="display: flex;justify-content: center;width: 100%;">
-            <v-btn :color="$blue" target="_blank"
+            <v-btn class="mr-2" :color="$blue" target="_blank"
                    :href="'/storage/file-links/'+fileLink.file" v-for="fileLink in fileLinks"
             >
               {{ fileLink.name }}
