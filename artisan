@@ -30,9 +30,7 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 |
 */
 
-$kernel = $app->make(
-     ( strlen(__NAMESPACE__) ? __NAMESPACE__ . '\\' . 'Illuminate\Contracts\Http\Kernel' : 'Illuminate\Contracts\Http\Kernel' )
-);
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
 $status = $kernel->handle(
     $input = new Symfony\Component\Console\Input\ArgvInput,

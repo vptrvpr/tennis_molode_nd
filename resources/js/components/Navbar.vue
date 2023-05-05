@@ -27,10 +27,22 @@
                  v-on="on"
                  href="#" role="button"
               >
-                <i v-if="user.checkRole(1)" class="fas fa-user-shield"></i>
+                <svg v-if="user.checkRole(1)" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" class="feather feather-user-check"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="8.5" cy="7" r="4"/>
+                  <polyline points="17 11 19 13 23 9"/>
+                </svg>
                 <img :src="user.photo_url" class="rounded-circle profile-photo mr-1">
                 {{ user.name }}
               </a>
+              <div style="font-size: 12px;text-align: right">
+                <span>Часы: {{ user.hours }}</span><br>
+                <span>Бонусные часы: {{ user.bonus_hours }}</span>
+              </div>
+
             </template>
 
             <v-list>
@@ -64,46 +76,46 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import LocaleDropdown from './LocaleDropdown'
-  import Preloader from "./Preloader";
+import { mapGetters } from 'vuex'
+import LocaleDropdown from './LocaleDropdown'
+import Preloader from './Preloader'
 
-  export default {
-    components: {
-      Preloader,
-      LocaleDropdown
-    },
+export default {
+  components: {
+    Preloader,
+    LocaleDropdown
+  },
 
-    data: () => ( {
-      appName: window.config.appName
-    } ),
+  data: () => ({
+    appName: window.config.appName
+  }),
 
-    computed: mapGetters( {
-      user: 'auth/user'
-    } ),
+  computed: mapGetters({
+    user: 'auth/user'
+  }),
 
-    methods: {
-      async logout() {
-        // Log out the user.
-        await this.$store.dispatch( 'auth/logout' )
+  methods: {
+    async logout () {
+      // Log out the user.
+      await this.$store.dispatch('auth/logout')
 
-        // Redirect to login.
-        this.$router.push( { name: 'login' } )
-      }
+      // Redirect to login.
+      this.$router.push({ name: 'login' })
     }
   }
+}
 </script>
 
 <style scoped>
-  .profile-photo {
-    width: 2rem;
-    height: 2rem;
-    margin: -.375rem 0;
-  }
+.profile-photo {
+  width: 2rem;
+  height: 2rem;
+  margin: -.375rem 0;
+}
 
-  .navbar {
-    background: url("/img/shapka_zapisi.png");
-    background-position: center;
-    background-size: cover;
-  }
+.navbar {
+  background: url("/img/shapka_zapisi.png");
+  background-position: center;
+  background-size: cover;
+}
 </style>
