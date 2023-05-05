@@ -21,6 +21,7 @@ class CourtController extends Controller
     {
         $date  = $request->get( 'date' );
         $weeks = Court::WEEKS;
+        
 
         $allCourts = Court::all()->toArray();
         $res       = [];
