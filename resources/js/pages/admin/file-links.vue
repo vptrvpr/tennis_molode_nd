@@ -70,7 +70,7 @@ export default {
 
       const { data } = await axios({
         method: 'POST',
-        url: '/api/admin/file-links/store/',
+        url: '/api/admin/file-links/store',
         data: formData,
       })
 
