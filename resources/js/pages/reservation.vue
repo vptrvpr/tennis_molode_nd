@@ -12,7 +12,6 @@
             >
               {{ fileLink.name }}
             </v-btn>
-            <br>
           </div>
           <div class="col-md-12 d-flex justify-content-center">
             <div class="d-flex">
@@ -48,15 +47,16 @@
           <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center">
           </div>
           <div class="col-md-4 pt-1 pb-0 d-flex justify-content-center date-picker-for-reservation">
-            <v-btn @click="changeWeek('sub')" class="mt-4" fab text :color="$blue" x-small><i
-                style="font-size: 19px"
-                class="fas fa-chevron-left"
-            />
+            <v-btn v-if="authUser.checkRole(1)" @click="changeWeek('sub')" class="mt-4" fab text :color="$blue" x-small>
+              <i
+                  style="font-size: 19px"
+                  class="fas fa-chevron-left"
+              />
             </v-btn>
             <v-text-field hide-details class="input-week-picker" v-model="weekForInput"
                           disabled :color="$blue"
             />
-            <v-btn @click="changeWeek('add')" class="mt-4" fab text :color="$blue" x-small><i
+            <v-btn v-if="authUser.checkRole(1)" @click="changeWeek('add')" class="mt-4" fab text :color="$blue" x-small><i
                 style="font-size: 19px"
                 class="fas fa-chevron-right"
             />
@@ -286,6 +286,7 @@ export default {
         this.$notif(r.data)
         this.getCourts()
         this.dialogCancelReservation = false
+        this.$store.dispatch('auth/fetchUser')
       })
     },
 
@@ -326,8 +327,10 @@ export default {
         this.$notif(response.data)
         this.getCourts()
         this.dialog = false
+        this.$store.dispatch('auth/fetchUser')
       }).catch((error) => {
         this.dialog = false
+        this.$store.dispatch('auth/fetchUser')
       })
     },
 

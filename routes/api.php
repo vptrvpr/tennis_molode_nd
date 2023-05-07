@@ -31,7 +31,6 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
 
 
         Route::post( '/file-links/store', 'FileLinkController@store' );
-        Route::get( '/file-links', 'FileLinkController@get' );
         Route::post( '/file-links/delete/{id}', 'FileLinkController@delete' );
 
 
@@ -40,6 +39,8 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
     Route::post( 'court/reservation', 'CourtController@reservation' );
     Route::delete( 'court/reservation/{id}', 'CourtController@cancelReservation' );
     Route::get( 'set-active-user/{userId}', 'CourtController@setActiveUser' );
+
+    Route::get( '/admin/file-links', 'Admin\FileLinkController@get' );
 } );
 
 Route::group( [ 'middleware' => 'guest:api' ], function() {

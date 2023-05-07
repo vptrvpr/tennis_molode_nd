@@ -23,6 +23,20 @@ class CourtController extends Controller
         $weeks = Court::WEEKS;
 
 
+        // updateHours
+        $startOfLastWeek = Carbon::now()->startOfWeek()->format( 'Y-m-d' );
+        $carbonForNow    = Carbon::now()->format( 'Y-m-d' );
+        if( $startOfLastWeek === $carbonForNow ) {
+            $updateJson = json_decode( file_get_contents( public_path( '/storage/update_hours.json' ) ), TRUE );
+            if( !isset( $updateJson[ $carbonForNow ] ) ) {
+                User::where( 'id', '>', 0 )->update( [ 'hours' => 2 ] );
+                $updateJson[ $carbonForNow ] = TRUE;
+                $updateJson                  = json_encode( $updateJson );
+                file_put_contents( public_path( '/storage/update_hours.json' ), $updateJson );
+            }
+        }
+
+
         $allCourts = Court::all()->toArray();
         $res       = [];
 
@@ -131,9 +145,15 @@ class CourtController extends Controller
         }
 
         foreach( $byDate as $date => $hoursByDate ) {
+            if( $date !== '2023-05-07' ) {
+                continue;
+            }
+
+
             $hoursByDateForCheck = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
 
-            $isSelectHours = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
+            $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
+            $isSelectHoursAll = collect( $hoursByDate )->where( 'is_select', TRUE );
 
             if( $isSelectHours ) {
                 $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] - 1 ) . ':00:00';
@@ -143,9 +163,26 @@ class CourtController extends Controller
             }
 
 
-
-            if( !( $carbonHowMuchMinutes < 15 ) && $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
+            if( $carbonHowMuchMinutes > 15 && $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
+            }
+
+
+            // hours
+            if( $carbonHowMuchMinutes > 15 && !\Auth::user()->checkRole( 1 ) ) {
+                $user     = \Auth::user();
+                $allHours = $user->hours + $user->bonus_hours;
+                if( $allHours < $isSelectHoursAll->count() ) {
+                    return response()->json( [ 'text' => 'На вашем балансе недостаточно часов' ], 422 );
+                } else {
+                    $minusHours  = $isSelectHoursAll->count();
+                    $user->hours = $user->hours - $minusHours;
+                    if( $user->hours < 0 ) {
+                        $user->bonus_hours = $user->bonus_hours + $user->hours;
+                        $user->hours       = 0;
+                    }
+                    $user->save();
+                }
             }
 
             $hoursByCourts = collect( $hoursByDate )->groupBy( 'court_id' );
@@ -189,14 +226,20 @@ class CourtController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function cancelReservation( $id )
+    public
+    function cancelReservation( $id )
     {
+        $user              = \Auth::user();
+        $user->bonus_hours = $user->bonus_hours + 1;
+        $user->save();
         Hour::where( 'id', $id )->delete();
+
         return response()->json( [ 'text' => 'Бронь отменена' ] );
     }
 
 
-    public function setActiveUser( $userId )
+    public
+    function setActiveUser( $userId )
     {
         $user            = \App\User::where( 'id', $userId )->first();
         $user->is_active = !$user->is_active;

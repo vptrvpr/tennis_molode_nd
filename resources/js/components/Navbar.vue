@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px;">
     <div class="container">
-      <a href="http://molodnd.ru/" class="navbar-brand">
+      <a href="/" class="navbar-brand">
         <img src="/img/Bely_logo.png" height="90px">
       </a>
       <!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"-->
@@ -23,6 +23,7 @@
           <v-menu bottom nudge-bottom="45" attach="#btnDropDownLogout">
             <template v-slot:activator="{ on, attrs }">
               <a class="nav-link dropdown-toggle text-dark"
+                 style="padding-bottom: 0px"
                  v-bind="attrs"
                  v-on="on"
                  href="#" role="button"
