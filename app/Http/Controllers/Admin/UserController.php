@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function get()
     {
-        $users = User::with( 'roles' )->get();
+        $users = User::with( 'roles' )->orderBy( 'id' )->get();
         return response()->json( $users );
     }
 
@@ -43,5 +43,13 @@ class UserController extends Controller
         User::where( 'id', $userId )->delete();
 
         return response()->json( [ 'text' => 'Пользователь успешно удален' ] );
+    }
+
+
+    public function setHours( Request $request )
+    {
+        $user                                  = User::where( 'id', $request->get( 'user_id' ) )->first();
+        $user[ $request->get( 'hours_type' ) ] = $user[ $request->get( 'hours_type' ) ] + $request->get( 'hours' );
+        $user->save();
     }
 }

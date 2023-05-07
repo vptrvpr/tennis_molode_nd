@@ -27,6 +27,7 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
         Route::post( '/user/active/{userId}', 'UserController@active' );
         Route::post( '/user/admin/{userId}', 'UserController@admin' );
         Route::post( '/user/delete/{userId}', 'UserController@delete' );
+        Route::post( '/user/set-hours', 'UserController@setHours' );
 
 
         Route::post( '/file-links/store', 'FileLinkController@store' );
