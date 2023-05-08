@@ -145,11 +145,6 @@ class CourtController extends Controller
         }
 
         foreach( $byDate as $date => $hoursByDate ) {
-            if( $date !== '2023-05-07' ) {
-                continue;
-            }
-
-
             $hoursByDateForCheck = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
 
             $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
