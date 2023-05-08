@@ -66,7 +66,7 @@ class CourtController extends Controller
 
                 for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
                     $dateForCheck  = $date->hour( $h - 1 );
-                    $isReservation = Carbon::now()->gt( $dateForCheck );
+                    $isReservation = Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck );
                     $hourEmpty     = [
                         "court_id"        => $court[ 'id' ],
                         "is_reservation"  => $isReservation,
@@ -95,7 +95,7 @@ class CourtController extends Controller
                         }
                     }
 
-                    if( Carbon::now()->gt( $dateForCheck ) ) {
+                    if( Carbon::now('Europe/Moscow')->gt( $dateForCheck ) ) {
                         $newHours[ $h ][ 'time_has_passed' ] = TRUE;
                     }
 
@@ -150,9 +150,10 @@ class CourtController extends Controller
             $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
             $isSelectHoursAll = collect( $hoursByDate )->where( 'is_select', TRUE );
 
+
             if( $isSelectHours ) {
-                $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] - 1 ) . ':00:00';
-                $carbonHowMuchMinutes  = Carbon::now()->diffInMinutes( $carbonDateCourtString );
+                $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] ) . ':00:00';
+                $carbonHowMuchMinutes  = Carbon::now( 'Europe/Moscow' )->diffInMinutes( $carbonDateCourtString );
             } else {
                 $carbonHowMuchMinutes = 20;
             }
@@ -190,7 +191,7 @@ class CourtController extends Controller
                     return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
                 } );
 
-                if( $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
+                if( $carbonHowMuchMinutes > 15 && $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
                     return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
                 }
             }

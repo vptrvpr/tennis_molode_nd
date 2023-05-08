@@ -9,6 +9,10 @@ import VueTheMask from 'vue-the-mask'
 import Notifications from 'vue-notification'
 import { WebRTC } from 'vue-webrtc'
 
+import momentTimezone from 'moment-timezone'
+
+momentTimezone.tz.setDefault('Asia/Jakarta')
+
 
 Vue.component( WebRTC.name, WebRTC )
 Vue.use( Notifications )
