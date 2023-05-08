@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Court;
 use App\Models\Hour;
+use App\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use jeremykenedy\LaravelRoles\Models\Role;
 
