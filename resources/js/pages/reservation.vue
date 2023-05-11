@@ -187,7 +187,7 @@
                         </template>
                         <v-list v-if="hour.is_reservation && hour.user_id && authUser.id">
                           <div class="p-1">
-                            {{ hour.user.name }}<br>
+                            {{ hour.user ? hour.user.name : '' }}<br>
                             <template v-if="authUser.checkRole(1)">
                               {{ $moment(hour.created_at).format('DD.MM.YYYY hh:mm:ss') }}
                             </template>
