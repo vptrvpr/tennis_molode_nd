@@ -1,9 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light" style="height: 100px;">
     <div class="container">
-      <a href="/" class="navbar-brand">
-        <img src="/img/Bely_logo.png" height="90px">
-      </a>
       <!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"-->
       <!--              aria-controls="navbarToggler" aria-expanded="false">-->
       <!--        <span class="navbar-toggler-icon"/>-->
@@ -19,11 +16,11 @@
       <!---->
       <ul class="navbar-nav ml-auto">
         <!--          Authenticated-->
-        <li v-if="user.id" class="nav-item dropdown" id="btnDropDownLogout">
+        <li v-if="user.id" class="nav-item dropdown" style="background-color: rgba(255,255,255,0.9);padding: 5px 30px;" id="btnDropDownLogout">
           <v-menu bottom nudge-bottom="45" attach="#btnDropDownLogout">
             <template v-slot:activator="{ on, attrs }">
               <a class="nav-link dropdown-toggle text-dark"
-                 style="padding-bottom: 0px"
+                 style="padding-bottom: 0px;padding-top 0px"
                  v-bind="attrs"
                  v-on="on"
                  href="#" role="button"

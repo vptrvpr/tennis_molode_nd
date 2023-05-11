@@ -16,7 +16,7 @@
     border-left: thin solid rgba(255, 255, 255, .46) !important;
   }
 
-  .btn-reservation-info{
+  .btn-reservation-info {
     width: 32px !important;
     height: 32px !important;
   }
@@ -40,8 +40,11 @@
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.34);
   }
 
-  .navbar{
-    background: url("/img/shapka_zapisi.png") !important;
+  .navbar {
+    background: url("/img/shapka_zapisi.png");
+    background-position: center;
+    background-size: 90%;
+    background-repeat: no-repeat;
   }
 }
 

@@ -229,7 +229,7 @@ class CourtController extends Controller
     function cancelReservation( $id )
     {
         $user              = \Auth::user();
-        $user->bonus_hours = $user->hours + 1;
+        $user->hours = $user->hours + 1;
         $user->save();
         Hour::where( 'id', $id )->delete();
 
