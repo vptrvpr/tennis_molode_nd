@@ -95,7 +95,7 @@ class CourtController extends Controller
                         }
                     }
 
-                    if( Carbon::now('Europe/Moscow')->gt( $dateForCheck ) ) {
+                    if( Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck ) ) {
                         $newHours[ $h ][ 'time_has_passed' ] = TRUE;
                     }
 
@@ -145,11 +145,12 @@ class CourtController extends Controller
         }
 
         foreach( $byDate as $date => $hoursByDate ) {
-            $hoursByDateForCheck = collect( $hoursByDate )->where( 'user_id', \Auth::id() )->count();
+            $hoursByDateForCheck = collect( $hoursByDate )->filter( function( $item ) {
+                return $item[ 'user_id' ] === \Auth::user()->id || $item[ 'is_select' ] === TRUE;
+            } )->count();
 
             $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
             $isSelectHoursAll = collect( $hoursByDate )->where( 'is_select', TRUE );
-
 
             if( $isSelectHours ) {
                 $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] ) . ':00:00';
@@ -181,19 +182,21 @@ class CourtController extends Controller
                 }
             }
 
-            $hoursByCourts = collect( $hoursByDate )->groupBy( 'court_id' );
+            $hoursByAllCourts = collect( $hoursByDate );
 
-            foreach( $hoursByCourts as $hoursByCourt ) {
-                $hoursByCourtSelect = $hoursByCourt->where( 'is_select', TRUE );
 
-                $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
-                    $carbonDate = Carbon::create( $item[ 'date' ] );
-                    return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
-                } );
+            $hoursByCourtSelect = collect( $hoursByAllCourts )->filter( function( $item ) {
+                return $item[ 'is_select' ] || ( $item[ 'is_reservation' ] && $item[ 'user_id' ] === \Auth::user()->id );
+            } );
 
-                if( $carbonHowMuchMinutes > 15 && $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
-                    return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
-                }
+            $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
+                $carbonDate = Carbon::create( $item[ 'date' ] );
+                return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
+            } );
+
+
+            if( $carbonHowMuchMinutes > 15 && $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
+                return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
             }
         }
 
@@ -226,7 +229,7 @@ class CourtController extends Controller
     function cancelReservation( $id )
     {
         $user              = \Auth::user();
-        $user->bonus_hours = $user->bonus_hours + 1;
+        $user->bonus_hours = $user->hours + 1;
         $user->save();
         Hour::where( 'id', $id )->delete();
 

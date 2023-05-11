@@ -8,6 +8,7 @@
           </div>
           <div style="display: flex;justify-content: center;width: 100%;">
             <v-btn class="mr-2" :color="$blue" target="_blank"
+                   small
                    :href="'/storage/file-links/'+fileLink.file" v-for="fileLink in fileLinks"
             >
               {{ fileLink.name }}
@@ -56,10 +57,11 @@
             <v-text-field hide-details class="input-week-picker" v-model="weekForInput"
                           disabled :color="$blue"
             />
-            <v-btn v-if="authUser.checkRole(1)" @click="changeWeek('add')" class="mt-4" fab text :color="$blue" x-small><i
-                style="font-size: 19px"
-                class="fas fa-chevron-right"
-            />
+            <v-btn v-if="authUser.checkRole(1)" @click="changeWeek('add')" class="mt-4" fab text :color="$blue" x-small>
+              <i
+                  style="font-size: 19px"
+                  class="fas fa-chevron-right"
+              />
             </v-btn>
           </div>
           <div class="col-md-4 pt-1 pb-0"></div>
@@ -118,10 +120,26 @@
                           <td
                               v-bind="attrs"
                               v-on="on"
+                              v-if="hour.time_has_passed && !authUser.checkRole(1)"
                               :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
                               :id="`tdWithHour${key}${hour.hour}`"
-                              v-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)
-                          "
+                          >
+                            <v-btn class="button-for-reservation"
+                                   :disabled="true"
+                                   :style="{opacity: hour.is_reservation && !hour.user_id ? 0.5 : 1}"
+                                   elevation="0"
+                                   :color="hour.is_select ? $green : $blue"
+                                   tile x-small
+                            >
+                            </v-btn>
+                          </td>
+                          <td
+                              v-bind="attrs"
+                              v-on="on"
+                              :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
+                              :id="`tdWithHour${key}${hour.hour}`"
+                              v-else-if="hour.is_reservation && hour.user_id === authUser.id || hour.is_reservation && hour.user_id && authUser.checkRole(1)
+                         "
                           >
                             <v-btn class="button-for-reservation"
                                    elevation="0"
@@ -255,7 +273,6 @@ function initialState () {
 export default {
   name: 'reservation.vue',
   mixins: [ AuthMixin ],
-  middleware: [ 'is-active' ],
   data () {
     return initialState()
   },

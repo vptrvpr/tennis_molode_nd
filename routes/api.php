@@ -39,8 +39,6 @@ Route::group( [ 'middleware' => 'auth:api' ], function() {
     Route::post( 'court/reservation', 'CourtController@reservation' );
     Route::delete( 'court/reservation/{id}', 'CourtController@cancelReservation' );
     Route::get( 'set-active-user/{userId}', 'CourtController@setActiveUser' );
-
-    Route::get( '/admin/file-links', 'Admin\FileLinkController@get' );
 } );
 
 Route::group( [ 'middleware' => 'guest:api' ], function() {
@@ -56,5 +54,7 @@ Route::group( [ 'middleware' => 'guest:api' ], function() {
     Route::post( 'oauth/{driver}', 'Auth\OAuthController@redirectToProvider' );
     Route::get( 'oauth/{driver}/callback', 'Auth\OAuthController@handleProviderCallback' )->name( 'oauth.callback' );
 } );
+
+Route::get( '/admin/file-links', 'Admin\FileLinkController@get' );
 
 Route::get( 'court/get', 'CourtController@get' );
