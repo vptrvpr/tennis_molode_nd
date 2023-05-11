@@ -112,7 +112,7 @@ export default {
 }
 
 .navbar {
-  background: url("/img/shapka_zapisi.png");
+  background: url("/img/shapka_zapisi.png?1");
   background-position: center;
   background-size: cover;
 }
