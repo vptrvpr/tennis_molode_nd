@@ -66,7 +66,7 @@ class CourtController extends Controller
 
                 for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
                     $dateForCheck  = $date->hour( $h - 1 );
-                    $isReservation = Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck );
+                    $isReservation = Carbon::now( 'Europe/Moscow' )->addMinutes( 90 )->gt( $dateForCheck );
                     $hourEmpty     = [
                         "court_id"        => $court[ 'id' ],
                         "is_reservation"  => $isReservation,
@@ -95,7 +95,7 @@ class CourtController extends Controller
                         }
                     }
 
-                    if( Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck ) ) {
+                    if( Carbon::now( 'Europe/Moscow' )->addMinutes( 90 )->gt( $dateForCheck ) ) {
                         $newHours[ $h ][ 'time_has_passed' ] = TRUE;
                     }
 

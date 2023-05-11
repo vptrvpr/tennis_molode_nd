@@ -120,7 +120,23 @@
                           <td
                               v-bind="attrs"
                               v-on="on"
-                              v-if="hour.time_has_passed && !authUser.checkRole(1)"
+                              v-if="!authUser.id || !authUser.is_active"
+                              :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
+                              :id="`tdWithHour${key}${hour.hour}`"
+                          >
+                            <v-btn class="button-for-reservation"
+                                   :disabled="true"
+                                   :style="{opacity: hour.is_reservation && !hour.user_id ? 0.5 : 1}"
+                                   elevation="0"
+                                   :color="hour.is_select ? $green : $blue"
+                                   tile x-small
+                            >
+                            </v-btn>
+                          </td>
+                          <td
+                              v-bind="attrs"
+                              v-on="on"
+                              v-else-if="hour.time_has_passed && !authUser.checkRole(1)"
                               :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
                               :id="`tdWithHour${key}${hour.hour}`"
                           >
@@ -169,7 +185,7 @@
                           </td>
 
                         </template>
-                        <v-list v-if="hour.is_reservation && hour.user_id">
+                        <v-list v-if="hour.is_reservation && hour.user_id && authUser.id">
                           <div class="p-1">
                             {{ hour.user.name }}<br>
                             <template v-if="authUser.checkRole(1)">
