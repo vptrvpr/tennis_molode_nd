@@ -55,12 +55,12 @@
         </li>
         <!--          Guest-->
         <template v-else>
-          <li class="nav-item">
+          <li class="nav-item" style="background-color: rgba(255,255,255,0.9);">
             <router-link :to="{ name: 'login' }" class="nav-link" active-class="active">
               Войти
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" style="background-color: rgba(255,255,255,0.9);">
             <router-link :to="{ name: 'register' }" class="nav-link" active-class="active">
               Регистрация
             </router-link>
