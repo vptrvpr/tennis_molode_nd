@@ -165,23 +165,6 @@ class CourtController extends Controller
             }
 
 
-            // hours
-            if( $carbonHowMuchMinutes > 15 && !\Auth::user()->checkRole( 1 ) ) {
-                $user     = \Auth::user();
-                $allHours = $user->hours + $user->bonus_hours;
-                if( $allHours < $isSelectHoursAll->count() ) {
-                    return response()->json( [ 'text' => 'На вашем балансе недостаточно часов' ], 422 );
-                } else {
-                    $minusHours  = $isSelectHoursAll->count();
-                    $user->hours = $user->hours - $minusHours;
-                    if( $user->hours < 0 ) {
-                        $user->bonus_hours = $user->bonus_hours + $user->hours;
-                        $user->hours       = 0;
-                    }
-                    $user->save();
-                }
-            }
-
             $hoursByAllCourts = collect( $hoursByDate );
 
 
@@ -198,6 +181,25 @@ class CourtController extends Controller
             if( $carbonHowMuchMinutes > 15 && $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
             }
+
+
+            // hours
+            if( $carbonHowMuchMinutes > 15 && !\Auth::user()->checkRole( 1 ) ) {
+                $user     = \Auth::user();
+                $allHours = $user->hours + $user->bonus_hours;
+                if( $allHours < $isSelectHoursAll->count() ) {
+                    return response()->json( [ 'text' => 'На вашем балансе недостаточно часов' ], 422 );
+                } else {
+                    $minusHours  = $isSelectHoursAll->count();
+                    $user->hours = $user->hours - $minusHours;
+                    if( $user->hours < 0 ) {
+                        $user->bonus_hours = $user->bonus_hours + $user->hours;
+                        $user->hours       = 0;
+                    }
+                    $user->save();
+                }
+            }
+            
         }
 
         foreach( $hoursData as $hours ) {
