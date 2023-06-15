@@ -108,6 +108,8 @@
                   <td style="width: 36px;white-space: nowrap;">{{ getHours(key) }}</td>
                   <template v-for="(hour,hourKey) in hoursBy">
                     <template v-if="hour.is_reservation !== undefined">
+<!--                      {{$moment(`${hour.date} ${hour.hour}:00:00`).diff($moment(),'minutes')}}-->
+
                       <v-menu
                           nudge-left="0"
                           nudge-top="40"
@@ -159,6 +161,7 @@
                           >
                             <v-btn class="button-for-reservation"
                                    elevation="0"
+                                   :disabled="hour.minutes_left"
                                    @click="openDialogCancelReservation(hour.id)"
                                    :color="$red"
                                    tile x-small

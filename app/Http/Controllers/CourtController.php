@@ -22,10 +22,9 @@ class CourtController extends Controller
         $date  = $request->get( 'date' );
         $weeks = Court::WEEKS;
 
-
         // updateHours
-        $startOfLastWeek = Carbon::now()->startOfWeek()->format( 'Y-m-d' );
-        $carbonForNow    = Carbon::now()->format( 'Y-m-d' );
+        $startOfLastWeek = Carbon::now( 'Europe/Moscow' )->startOfWeek()->format( 'Y-m-d' );
+        $carbonForNow    = Carbon::now( 'Europe/Moscow' )->format( 'Y-m-d' );
         if( $startOfLastWeek === $carbonForNow ) {
             $updateJson = json_decode( file_get_contents( public_path( '/storage/update_hours.json' ) ), TRUE );
             if( !isset( $updateJson[ $carbonForNow ] ) ) {
@@ -66,7 +65,7 @@ class CourtController extends Controller
 
                 for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
                     $dateForCheck  = $date->hour( $h - 1 );
-                    $isReservation = Carbon::now( 'Europe/Moscow' )->addMinutes( 90 )->gt( $dateForCheck );
+                    $isReservation = Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck );
                     $hourEmpty     = [
                         "court_id"        => $court[ 'id' ],
                         "is_reservation"  => $isReservation,
@@ -74,6 +73,7 @@ class CourtController extends Controller
                         "time_has_passed" => FALSE,
                         "is_select"       => FALSE,
                         "show_details"    => FALSE,
+                        "minutes_left"    => FALSE,
                         "hour"            => $h,
                         "date"            => $date->format( 'Y-m-d' ),
                         "user"            => [],
@@ -95,8 +95,12 @@ class CourtController extends Controller
                         }
                     }
 
-                    if( Carbon::now( 'Europe/Moscow' )->addMinutes( 90 )->gt( $dateForCheck ) ) {
+                    if( Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck ) ) {
                         $newHours[ $h ][ 'time_has_passed' ] = TRUE;
+                    }
+
+                    if( Carbon::now( 'Europe/Moscow' )->addMinutes( 150 )->gt( $date ) ) {
+                        $newHours[ $h ][ 'minutes_left' ] = TRUE;
                     }
 
                     $res[ $h ][] = $newHours[ $h ];
@@ -199,7 +203,7 @@ class CourtController extends Controller
                     $user->save();
                 }
             }
-            
+
         }
 
         foreach( $hoursData as $hours ) {
@@ -230,7 +234,7 @@ class CourtController extends Controller
     public
     function cancelReservation( $id )
     {
-        $user              = \Auth::user();
+        $user        = \Auth::user();
         $user->hours = $user->hours + 1;
         $user->save();
         Hour::where( 'id', $id )->delete();
