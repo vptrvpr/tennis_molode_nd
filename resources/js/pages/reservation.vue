@@ -161,7 +161,7 @@
                           >
                             <v-btn class="button-for-reservation"
                                    elevation="0"
-                                   :disabled="hour.minutes_left"
+                                   :disabled="hour.minutes_left && !authUser.checkRole(1)"
                                    @click="openDialogCancelReservation(hour.id)"
                                    :color="$red"
                                    tile x-small
