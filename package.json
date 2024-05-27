@@ -17,7 +17,8 @@
     "@fortawesome/free-solid-svg-icons": "^5.8.1",
     "@fortawesome/vue-fontawesome": "^0.1.6",
     "axios": "^0.18.1",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^4.6.2",
+    "bootstrap-vue": "^2.23.1",
     "jquery": "^3.4.1",
     "js-cookie": "^2.2.0",
     "moment": "^2.26.0",
@@ -26,7 +27,7 @@
     "sweetalert2": "^8.10.0",
     "vform": "^1.0.0",
     "video.js": "^6.6.0",
-    "vue": "^2.6.10",
+    "vue": "^2.7.16",
     "vue-core-video-player": "^0.2.0",
     "vue-i18n": "^8.11.2",
     "vue-meta": "^1.6.0",
@@ -55,9 +56,10 @@
     "laravel-mix": "^4.0.15",
     "laravel-mix-versionhash": "^1.0.7",
     "resolve-url-loader": "^2.3.1",
-    "sass": "^1.20.1",
-    "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.6.10",
+    "sass": "^1.77.2",
+    "sass-loader": "^7.3.1",
+    "terser-webpack-plugin": "^4.2.3",
+    "vue-template-compiler": "^2.7.16",
     "webpack-bundle-analyzer": "^3.3.2"
   }
 }

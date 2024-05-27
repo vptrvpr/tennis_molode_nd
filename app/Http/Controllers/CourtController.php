@@ -22,20 +22,6 @@ class CourtController extends Controller
         $date  = $request->get( 'date' );
         $weeks = Court::WEEKS;
 
-        // updateHours
-        $startOfLastWeek = Carbon::now( 'Europe/Moscow' )->startOfWeek()->format( 'Y-m-d' );
-        $carbonForNow    = Carbon::now( 'Europe/Moscow' )->format( 'Y-m-d' );
-        if( $startOfLastWeek === $carbonForNow ) {
-            $updateJson = json_decode( file_get_contents( public_path( '/storage/update_hours.json' ) ), TRUE );
-            if( !isset( $updateJson[ $carbonForNow ] ) ) {
-                User::where( 'id', '>', 0 )->update( [ 'hours' => 2 ] );
-                $updateJson[ $carbonForNow ] = TRUE;
-                $updateJson                  = json_encode( $updateJson );
-                file_put_contents( public_path( '/storage/update_hours.json' ), $updateJson );
-            }
-        }
-
-
         $allCourts = Court::all()->toArray();
         $res       = [];
 
