@@ -62,7 +62,7 @@ export const mutations = {
   [ types.UPDATE_USER ]( state, { user } ) {
     user.checkRole = function ( roleId ) {
       var checkResult = false
-      user.roles.ma( item => {
+      user.roles.map( item => {
         if ( item.id === roleId ) {
           checkResult = true
         }
