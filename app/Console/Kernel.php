@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
     protected function schedule( Schedule $schedule )
     {
         $schedule->command( 'update-hours' )
-                 ->mondays();
+                 ->mondays()->at( '00:00' );
     }
 
 
