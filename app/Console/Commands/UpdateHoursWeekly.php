@@ -12,7 +12,7 @@ class UpdateHoursWeekly extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'update-hours';
 
     /**
      * The console command description.

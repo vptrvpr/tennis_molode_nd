@@ -45,8 +45,10 @@ class TestCommand extends Command
      */
     public function handle()
     {
-        $user = \App\User::first();
-        \Mail::queue( new NewUserMail( $user ) );
+
+
+//        $user = \App\User::first();
+//        \Mail::queue( new NewUserMail( $user ) );
 //        $date  = [ '2020-06-29', '2020-07-05' ];
 //        $weeks = Court::WEEKS;
 //        $res   = [];

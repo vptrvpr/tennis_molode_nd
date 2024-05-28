@@ -74,8 +74,14 @@
               Забронировать
             </v-btn>
             <v-alert type="warning" v-else-if="authUser.id && !authUser.is_active">
-              Обратитесь к <a href="https://vk.com/yakov_nk" target="_blank">администратору</a>, для
-              получения полномочий
+              Необходимо заполнить заявление у председателя, подробно в разделе
+              <b-link v-if="fileLink.name === 'Новым участникам'"
+                      small
+                      :href="'/storage/file-links/'+fileLink.file" v-for="fileLink in fileLinks"
+              >
+                «Новым участникам»
+              </b-link>
+              .
             </v-alert>
             <v-btn v-else :color="$green" href="/login">
               ВОЙТИ
@@ -108,7 +114,7 @@
                   <td style="width: 36px;white-space: nowrap;">{{ getHours(key) }}</td>
                   <template v-for="(hour,hourKey) in hoursBy">
                     <template v-if="hour.is_reservation !== undefined">
-<!--                      {{$moment(`${hour.date} ${hour.hour}:00:00`).diff($moment(),'minutes')}}-->
+                      <!--                      {{$moment(`${hour.date} ${hour.hour}:00:00`).diff($moment(),'minutes')}}-->
 
                       <v-menu
                           nudge-left="0"
@@ -124,15 +130,18 @@
                               v-on="on"
                               v-if="!authUser.id || !authUser.is_active"
                               :class="(hourKey + 1) % 2 == 0 ? 'pr-2' : 'pl-2'"
-                              :id="`tdWithHour${key}${hour.hour}`"
+                              :id="hour.is_reservation && hour.user_id ? `tdWithHour${key}${hour.hour}` : ''"
                           >
                             <v-btn class="button-for-reservation"
                                    :disabled="true"
-                                   :style="{opacity: hour.is_reservation && !hour.user_id ? 0.5 : 1}"
+                                   :style="{opacity: hour.is_reservation && !hour.user_id ? 0.5 : 0.7 }"
                                    elevation="0"
                                    :color="hour.is_select ? $green : $blue"
                                    tile x-small
                             >
+                              <i v-if="hour.is_reservation && hour.user_id" style="font-size: 17px"
+                                 class="fa-solid fa-check"
+                              ></i>
                             </v-btn>
                           </td>
                           <td
@@ -184,14 +193,17 @@
                                    :color="hour.is_select ? $green : $blue"
                                    tile x-small
                             >
+                              <i v-if="hour.is_reservation && hour.user_id" style="font-size: 17px"
+                                 class="fa-solid fa-check"
+                              ></i>
                             </v-btn>
                           </td>
 
                         </template>
-                        <v-list v-if="hour.is_reservation && hour.user_id && authUser.id">
+                        <v-list v-if="hour.is_reservation && hour.user_id">
                           <div class="p-1">
                             {{ hour.user ? hour.user.name : '' }}<br>
-                            <template v-if="authUser.checkRole(1)">
+                            <template v-if="authUser.id && authUser.checkRole(1)">
                               {{ $moment(hour.created_at).format('DD.MM.YYYY hh:mm:ss') }}
                             </template>
                           </div>
@@ -209,19 +221,28 @@
             </v-simple-table>
           </div>
 
-          <div class="p-3 row">
-            <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
-              <h5 class="text-center">Корт 1</h5>
-              <iframe src="http://www.cactus.tv:8080/cam24/embed.html" width="468" height="350" align="left">
-                Ваш браузер не поддерживает плавающие фреймы!
-              </iframe>
+          <div class="col-md-12 p-3 row">
+            <div class="col-md-12 d-flex justify-content-center">
+              <v-btn @click="showCamers = !showCamers"
+                     :color="$blue"
+              >
+                Прямая трансляция
+              </v-btn>
             </div>
-            <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
-              <h5 class="text-center">Корт 2</h5>
-              <iframe src="http://www.cactus.tv:8080/cam25/embed.html" width="468" height="350" align="left">
-                Ваш браузер не поддерживает плавающие фреймы!
-              </iframe>
-            </div>
+            <template v-if="showCamers">
+              <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
+                <h5 class="text-center">Корт 1</h5>
+                <iframe src="http://www.cactus.tv:8080/cam24/embed.html" width="468" height="350" align="left">
+                  Ваш браузер не поддерживает плавающие фреймы!
+                </iframe>
+              </div>
+              <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
+                <h5 class="text-center">Корт 2</h5>
+                <iframe src="http://www.cactus.tv:8080/cam25/embed.html" width="468" height="350" align="left">
+                  Ваш браузер не поддерживает плавающие фреймы!
+                </iframe>
+              </div>
+            </template>
 
 
           </div>
@@ -285,7 +306,8 @@ function initialState () {
     },
     headersTable: [],
     hours: [],
-    fileLinks: []
+    fileLinks: [],
+    showCamers: false
   }
 }
 
@@ -367,6 +389,9 @@ export default {
       }).catch((error) => {
         this.dialog = false
         this.$store.dispatch('auth/fetchUser')
+        if ( error.response.status == 443 ) {
+          this.getCourts()
+        }
       })
     },
 

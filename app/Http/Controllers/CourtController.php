@@ -50,9 +50,10 @@ class CourtController extends Controller
                 $hours     = collect( $courts[ $court[ 'id' ] ][ 'hours' ] )->groupBy( 'hour' );
 
                 for( $h = Hour::HOUR_RANGE[ $hoursBy ][ 0 ]; $h < Hour::HOUR_RANGE[ $hoursBy ][ 1 ]; $h++ ) {
-                    $dateForCheck  = $date->hour( $h - 1 );
+                    $dateForCheck  = $date->hour( $h - 2 );
                     $isReservation = Carbon::now( 'Europe/Moscow' )->gt( $dateForCheck );
-                    $hourEmpty     = [
+
+                    $hourEmpty = [
                         "court_id"        => $court[ 'id' ],
                         "is_reservation"  => $isReservation,
                         "user_id"         => NULL,
@@ -85,7 +86,7 @@ class CourtController extends Controller
                         $newHours[ $h ][ 'time_has_passed' ] = TRUE;
                     }
 
-                    if( Carbon::now( 'Europe/Moscow' )->addMinutes( 150 )->gt( $date ) ) {
+                    if( Carbon::now( 'Europe/Moscow' )->addMinutes( 30 )->gt( $date ) ) {
                         $newHours[ $h ][ 'minutes_left' ] = TRUE;
                     }
 
@@ -164,12 +165,12 @@ class CourtController extends Controller
 
             $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
                 $carbonDate = Carbon::create( $item[ 'date' ] );
-                return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 21 && !$carbonDate->isWeekend();
+                return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 22 && !$carbonDate->isWeekend();
             } );
 
 
             if( $carbonHowMuchMinutes > 15 && $hoursByCourtSelectForBan->count() > 1 && !\Auth::user()->checkRole( 1 ) ) {
-                return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 22' ], 422 );
+                return response()->json( [ 'text' => 'Нельзя забронировать больше 1 часа в будний день с 17 до 23' ], 422 );
             }
 
 
@@ -196,6 +197,11 @@ class CourtController extends Controller
             foreach( $hours as $hour ) {
                 if( !empty( $hour ) ) {
                     if( $hour[ 'user_id' ] == \Auth::id() && $hour && $hour[ 'is_select' ] ) {
+                        $checkHourAlreadyReservation = Hour::where( 'date', $hour[ 'date' ] )->where( 'court_id', $hour[ 'court_id' ] )
+                                                           ->where( 'hour', $hour[ 'hour' ] )->first();
+                        if( $checkHourAlreadyReservation !== NULL ) {
+                            return response()->json( [ 'text' => "Время которое вы выбрали уже забронировано - {$hour['hour']}:00" ], 443 );
+                        }
                         $newHour                 = new Hour();
                         $newHour->is_reservation = TRUE;
                         $newHour->user_id        = \Auth::id();
