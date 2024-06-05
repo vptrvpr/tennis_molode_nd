@@ -26,7 +26,7 @@ class FileLinkController extends Controller
     {
         $requestJSON = json_decode( $request->get( 'json' ) );
 
-        $fileLink       = $requestJSON->id ? FileLink::where( 'id', $requestJSON->id )->first() : new FileLink();
+        $fileLink       = isset( $requestJSON->id ) ? FileLink::where( 'id', $requestJSON->id )->first() : new FileLink();
         $fileLink->name = $requestJSON->name;
 
         if( $request->file( 'file' ) ) {
