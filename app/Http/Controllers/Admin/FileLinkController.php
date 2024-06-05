@@ -26,7 +26,7 @@ class FileLinkController extends Controller
     {
         $requestJSON = json_decode( $request->get( 'json' ) );
 
-        $fileLink       = new FileLink();
+        $fileLink       = $requestJSON->id ? FileLink::where( 'id', $requestJSON->id )->first() : new FileLink();
         $fileLink->name = $requestJSON->name;
 
         if( $request->file( 'file' ) ) {
@@ -37,8 +37,6 @@ class FileLinkController extends Controller
             $file->move( public_path( 'storage/file-links/' ), $fileName );
             $fileLink->file = $fileName;
         }
-
-
         $fileLink->save();
 
     }

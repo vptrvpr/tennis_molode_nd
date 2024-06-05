@@ -30,11 +30,22 @@
           <td><a target="_blank" :href="'/storage/file-links/'+fileLink.file">{{ fileLink.name }}</a></td>
           <td>
             <v-btn :color="$red" @click="deleteFileLink(fileLink.id)">Удалить</v-btn>
+            <v-btn :color="$green" @click="openEditFileLink(fileLink)">Редактировать</v-btn>
           </td>
           </tbody>
         </template>
       </v-simple-table>
     </div>
+
+
+    <b-modal @ok="storeFileLink" ref="edit-file" id="edit-file" title="Редактирование файла">
+      <div class="pl-5 pr-5">
+        <v-text-field :color="$blue" label="Имя" v-model="editFileLink.name" name="name"/>
+      </div>
+      <div class="pl-5 pr-5">
+        <v-file-input :color="$blue" label="Файл" v-model="editFileLink.file" name="file"/>
+      </div>
+    </b-modal>
 
   </v-card>
 </template>
@@ -49,7 +60,8 @@ function initialState () {
       file: null,
       name: '',
     },
-    fileLinks: []
+    fileLinks: [],
+    editFileLink: {}
   }
 }
 
@@ -63,6 +75,12 @@ export default {
     this.getFileLink()
   },
   methods: {
+    openEditFileLink (fileLink) {
+      this.editFileLink = fileLink
+      this.editFileLink = fileLink
+      this.$refs[ 'edit-file' ].show()
+    },
+
     async createFileLink () {
       let formData = new FormData()
       formData.append('file', this.newFileLink.file)
@@ -75,7 +93,20 @@ export default {
       })
 
       this.getFileLink()
+    },
 
+    async storeFileLink () {
+      let formData = new FormData()
+      formData.append('file', this.editFileLink.file)
+      formData.append('json', JSON.stringify(this.editFileLink))
+
+      const { data } = await axios({
+        method: 'POST',
+        url: '/api/admin/file-links/store',
+        data: formData,
+      })
+
+      this.getFileLink()
     },
 
     async getFileLink () {
@@ -85,6 +116,15 @@ export default {
       })
 
       this.fileLinks = data
+    },
+
+    async deleteFileLink (id) {
+      const { data } = await axios({
+        method: 'post',
+        url: '/api/admin/file-links/delete/' + id,
+      })
+
+      this.getFileLink()
     },
 
     async deleteFileLink (id) {
