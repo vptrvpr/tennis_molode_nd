@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
                  ->mondays()->at( '00:00' );
 
         $schedule->command( 'test:test' )
-                 ->mondays()->at( '00:10' );
+                 ->mondays()->at( '00:22' );
     }
 
 
