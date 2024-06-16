@@ -27,10 +27,12 @@ class Kernel extends ConsoleKernel
     protected function schedule( Schedule $schedule )
     {
         $schedule->command( 'update-hours' )
+                 ->timezone( 'Europe/Moscow' )
                  ->weekly()->mondays()->at( '00:00' );
 
         $schedule->command( 'test:test' )
-                 ->everyMinute();
+                 ->timezone( 'Europe/Moscow' )
+                 ->weekly()->mondays()->at( '00:30' );
     }
 
 
