@@ -28,6 +28,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command( 'update-hours' )
                  ->mondays()->at( '00:00' );
+
+        $schedule->command( 'test:test' )
+                 ->mondays()->at( '00:10' );
     }
 
 

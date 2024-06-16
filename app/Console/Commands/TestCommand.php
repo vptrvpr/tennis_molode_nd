@@ -46,7 +46,7 @@ class TestCommand extends Command
     public function handle()
     {
 
-
+        \Log::info( 'test test test' );
 //        $user = \App\User::first();
 //        \Mail::queue( new NewUserMail( $user ) );
 //        $date  = [ '2020-06-29', '2020-07-05' ];
