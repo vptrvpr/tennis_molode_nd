@@ -30,9 +30,9 @@ class Kernel extends ConsoleKernel
                  ->timezone( 'Europe/Moscow' )
                  ->weekly()->mondays()->at( '00:00' );
 
-        $schedule->command( 'test:test' )
-                 ->timezone( 'Europe/Moscow' )
-                 ->weekly()->mondays()->at( '00:30' );
+//        $schedule->command( 'test:test' )
+//                 ->timezone( 'Europe/Moscow' )
+//                 ->weekly()->mondays()->at( '00:30' );
     }
 
 
