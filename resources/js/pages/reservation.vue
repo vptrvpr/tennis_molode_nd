@@ -232,13 +232,13 @@
             <template v-if="showCamers">
               <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
                 <h5 class="text-center">Корт 1</h5>
-                <iframe src="http://www.cactus.tv:8080/cam24/embed.html" width="468" height="350" align="left">
+                <iframe src="https://cactus.tv:444/cam24/embed.html?&token=tennis" width="468" height="350" align="left">
                   Ваш браузер не поддерживает плавающие фреймы!
                 </iframe>
               </div>
               <div class="col-md-6 col-sm-12 justify-content-center" style="display: grid;">
                 <h5 class="text-center">Корт 2</h5>
-                <iframe src="http://www.cactus.tv:8080/cam25/embed.html" width="468" height="350" align="left">
+                <iframe src="https://cactus.tv:444/cam25/embed.html?&token=tennis" width="468" height="350" align="left">
                   Ваш браузер не поддерживает плавающие фреймы!
                 </iframe>
               </div>
