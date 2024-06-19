@@ -136,12 +136,18 @@ class CourtController extends Controller
         }
 
         foreach( $byDate as $date => $hoursByDate ) {
-            $hoursByDateForCheck = collect( $hoursByDate )->filter( function( $item ) use ( $date ) {
-                return ( $item[ 'user_id' ] === \Auth::user()->id || $item[ 'is_select' ] === TRUE ) && $date == Carbon::now()->format( 'Y-m-d' );
+            if( Carbon::create( Carbon::now()->format( 'Y-m-d' ) )->gt( $date ) ) {
+                continue;
+            }
+
+            $hoursByDateForCheck = collect( $hoursByDate )->filter( function( $item ) {
+                return ( $item[ 'user_id' ] === \Auth::user()->id || $item[ 'is_select' ] === TRUE );
             } )->count();
 
-            $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
-            $isSelectHoursAll = collect( $hoursByDate )->where( 'is_select', TRUE );
+
+            $isSelectHours         = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
+            $isSelectHoursAll      = collect( $hoursByDate )->where( 'is_select', TRUE );
+            $isSelectHoursAllCount = collect( $hoursByDate )->where( 'is_select', TRUE )->count();
 
             if( $isSelectHours ) {
                 $carbonDateCourtString = $date . ' ' . ( (int)$isSelectHours[ 'hour' ] ) . ':00:00';
@@ -149,7 +155,6 @@ class CourtController extends Controller
             } else {
                 $carbonHowMuchMinutes = 20;
             }
-
 
             if( $carbonHowMuchMinutes > 15 && $hoursByDateForCheck > 2 && !\Auth::user()->checkRole( 1 ) ) {
                 return response()->json( [ 'text' => 'Нельзя забронировать больше 2-х часов в день!' ], 422 );
@@ -178,10 +183,10 @@ class CourtController extends Controller
             if( $carbonHowMuchMinutes > 15 && !\Auth::user()->checkRole( 1 ) ) {
                 $user     = \Auth::user();
                 $allHours = $user->hours + $user->bonus_hours;
-                if( $allHours < $isSelectHoursAll->count() ) {
+                if( $allHours < $isSelectHoursAllCount ) {
                     return response()->json( [ 'text' => 'На вашем балансе недостаточно часов' ], 422 );
                 } else {
-                    $minusHours  = $isSelectHoursAll->count();
+                    $minusHours  = $isSelectHoursAllCount;
                     $user->hours = $user->hours - $minusHours;
                     if( $user->hours < 0 ) {
                         $user->bonus_hours = $user->bonus_hours + $user->hours;
