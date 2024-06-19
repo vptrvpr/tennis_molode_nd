@@ -138,7 +138,7 @@ class CourtController extends Controller
         foreach( $byDate as $date => $hoursByDate ) {
             $hoursByDateForCheck = collect( $hoursByDate )->filter( function( $item ) use ( $date ) {
                 return ( $item[ 'user_id' ] === \Auth::user()->id || $item[ 'is_select' ] === TRUE ) && $date == Carbon::now()->format( 'Y-m-d' );
-            } );
+            } )->count();
 
             $isSelectHours    = collect( $hoursByDate )->where( 'is_select', TRUE )->first();
             $isSelectHoursAll = collect( $hoursByDate )->where( 'is_select', TRUE );
