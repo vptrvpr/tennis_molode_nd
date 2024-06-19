@@ -170,7 +170,7 @@ class CourtController extends Controller
 
             $hoursByCourtSelectForBan = $hoursByCourtSelect->filter( function( $item ) {
                 $carbonDate = Carbon::create( $item[ 'date' ] );
-                return $item[ 'hour' ] >= 16 && $item[ 'hour' ] <= 22 && !$carbonDate->isWeekend();
+                return $item[ 'hour' ] >= 17 && $item[ 'hour' ] <= 22 && !$carbonDate->isWeekend();
             } );
 
 
