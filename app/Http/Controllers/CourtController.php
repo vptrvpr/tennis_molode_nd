@@ -195,7 +195,6 @@ class CourtController extends Controller
                     $user->save();
                 }
             }
-
         }
 
         foreach( $hoursData as $hours ) {
